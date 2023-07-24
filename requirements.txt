@@ -5,3 +5,4 @@ scipy
 matplotlib
 mechafil
 mechafil-jax @ git+https://github.com/kkarrancsu/mechafil-jax.git
+pandas==1.5.3
