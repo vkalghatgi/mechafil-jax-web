@@ -1,3 +1,7 @@
+pandas==1.5.3
+streamlit
+altair
+watchdog
 jax
 jaxlib
 numpy
@@ -5,4 +9,3 @@ scipy
 matplotlib
 mechafil
 mechafil-jax @ git+https://github.com/kkarrancsu/mechafil-jax.git
-pandas==1.5.3
