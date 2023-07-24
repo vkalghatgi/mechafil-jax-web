@@ -41,9 +41,13 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
     plot_df['RBP'] = results['rb_total_power_eib']
     plot_df['QAP'] = results['qa_total_power_eib']
     plot_df['Baseline'] = baseline
-    plot_df['day_pledge_per_QAP'] = results['day_pledge_per_QAP']
+    # plot_df['day_pledge_per_QAP'] = results['day_pledge_per_QAP']
     plot_df['day_rewards_per_sector'] = results['day_rewards_per_sector']
     plot_df['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
+
+    pledge_dff = pd.DataFrame()
+    pledge_dff['day_pledge_per_QAP'] = results['day_pledge_per_QAP'][1:]
+    pledge_dff['date'] = pd.to_datetime(du.get_t(start_date+timedelta(days=1), forecast_length=pledge_dff.shape[0]))
 
     roi_dff = pd.DataFrame()
     roi_dff['1y_sector_fofr'] = results['1y_sector_roi'][1:]
@@ -76,7 +80,7 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
 
     with col2:
         # pledge_per_qap_df = my_melt(cil_df_historical, cil_df_forecast, 'day_pledge_per_QAP')
-        pledge_per_qap_df = pd.melt(plot_df, id_vars=["date"],
+        pledge_per_qap_df = pd.melt(pledge_dff, id_vars=["date"],
                                     value_vars=["day_pledge_per_QAP"], var_name='na', value_name='FIL')
         day_pledge_per_QAP = (
             alt.Chart(pledge_per_qap_df)
