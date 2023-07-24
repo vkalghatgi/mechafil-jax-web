@@ -47,7 +47,7 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
 
     roi_dff = pd.DataFrame()
     roi_dff['1y_sector_fofr'] = results['1y_sector_roi'][1:]
-    roi_dff['date'] = pd.to_datetime(du.get_t(start_date+timedelta(days=1), forecast_length=len(results['1y_sector_roi'])))
+    roi_dff['date'] = pd.to_datetime(du.get_t(start_date+timedelta(days=1), forecast_length=roi_dff.shape[0]))
     d.debug(results['1y_sector_roi'])
     
     with col1:
