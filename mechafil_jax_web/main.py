@@ -46,8 +46,8 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
     plot_df['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
 
     roi_dff = pd.DataFrame()
-    roi_dff['1y_sector_fofr'] = results['1y_sector_roi']
-    roi_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=len(results['1y_sector_roi'])))
+    roi_dff['1y_sector_fofr'] = results['1y_sector_roi'][1:]
+    roi_dff['date'] = pd.to_datetime(du.get_t(start_date+timedelta(days=1), forecast_length=len(results['1y_sector_roi'])))
     d.debug(results['1y_sector_roi'])
     
     with col1:
@@ -81,18 +81,19 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
         day_pledge_per_QAP = (
             alt.Chart(pledge_per_qap_df)
             .mark_line()
-            .encode(x="date", y="FIL", color=alt.Color('na', legend=alt.Legend(orient="top", title=None)))
+            .encode(x="date", y="FIL")
             .properties(title="Pledge/32GiB QAP")
             .configure_title(fontSize=14, anchor='middle')
         )
         st.altair_chart(day_pledge_per_QAP.interactive(), use_container_width=True)
 
+        # TODO: make this into rewards/TIB
         reward_per_sector_df = pd.melt(plot_df, id_vars=["date"],
                                     value_vars=["day_rewards_per_sector"], var_name='na', value_name='FIL')
         reward_per_sector = (
             alt.Chart(reward_per_sector_df)
             .mark_line()
-            .encode(x="date", y="FIL", color=alt.Color('na', legend=alt.Legend(orient="top", title=None)))
+            .encode(x="date", y="FIL")
             .properties(title="Reward/32GiB Sector")
             .configure_title(fontSize=14, anchor='middle')
         )
