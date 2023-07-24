@@ -41,10 +41,13 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
     plot_df['RBP'] = results['rb_total_power_eib']
     plot_df['QAP'] = results['qa_total_power_eib']
     plot_df['Baseline'] = baseline
-    # plot_df['1y_sector_roi'] = results['1y_sector_roi']
     plot_df['day_pledge_per_QAP'] = results['day_pledge_per_QAP']
     plot_df['day_rewards_per_sector'] = results['day_rewards_per_sector']
     plot_df['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
+
+    roi_df = pd.DataFrame()
+    roi_df['1y_sector_roi'] = results['1y_sector_roi']
+    roi_df['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=roi_df.shape[0]))
     
     with col1:
         power_df = pd.melt(plot_df, id_vars=["date"], 
@@ -59,16 +62,16 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
         )
         st.altair_chart(power.interactive(), use_container_width=True) 
 
-        # roi_df = pd.melt(plot_df, id_vars=["date"], 
-        #                  value_vars=["1y_sector_roi"], var_name='na', value_name='ROI')
-        # roi = (
-        #     alt.Chart(roi_df)
-        #     .mark_line()
-        #     .encode(x="date", y="ROI", color=alt.Color('na', legend=alt.Legend(orient="top", title=None)))
-        #     .properties(title="1Y Sector FoFR")
-        #     .configure_title(fontSize=14, anchor='middle')
-        # )
-        # st.altair_chart(roi.interactive(), use_container_width=True)
+        roi_df = pd.melt(roi_df, id_vars=["date"], 
+                         value_vars=["1y_sector_roi"], var_name='na', value_name='ROI')
+        roi = (
+            alt.Chart(roi_df)
+            .mark_line()
+            .encode(x="date", y="ROI", color=alt.Color('na', legend=alt.Legend(orient="top", title=None)))
+            .properties(title="1Y Sector FoFR")
+            .configure_title(fontSize=14, anchor='middle')
+        )
+        st.altair_chart(roi.interactive(), use_container_width=True)
 
     with col2:
         # pledge_per_qap_df = my_melt(cil_df_historical, cil_df_forecast, 'day_pledge_per_QAP')
@@ -146,11 +149,11 @@ def main():
     st.title('Filecoin Economy Forecaster')
 
     st.slider("Raw Byte Onboarding (PiB/day)", min_value=3., max_value=20., value=6., step=.1, format='%0.02f', key="rbp_slider",
-              on_change=None, kwargs=None, disabled=False, label_visibility="visible")
+              on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
     st.slider("Renewal Rate (Percentage)", min_value=10, max_value=99, value=60, step=1, format='%d', key="rr_slider",
-              on_change=None, kwargs=None, disabled=False, label_visibility="visible")
+              on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
     st.slider("FIL+ Rate (Percentage)", min_value=10, max_value=99, value=70, step=1, format='%d', key="fpr_slider",
-              on_change=None, kwargs=None, disabled=False, label_visibility="visible")
+              on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
     st.button("Forecast", on_click=forecast_economy)
 
     # forecast_economy()
