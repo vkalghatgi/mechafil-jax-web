@@ -41,7 +41,7 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
     plot_df['RBP'] = results['rb_total_power_eib']
     plot_df['QAP'] = results['qa_total_power_eib']
     plot_df['Baseline'] = baseline
-    plot_df['1y_sector_roi'] = results['1y_sector_roi']
+    # plot_df['1y_sector_roi'] = results['1y_sector_roi']
     plot_df['day_pledge_per_QAP'] = results['day_pledge_per_QAP']
     plot_df['day_rewards_per_sector'] = results['day_rewards_per_sector']
     plot_df['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
@@ -59,16 +59,16 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
         )
         st.altair_chart(power.interactive(), use_container_width=True) 
 
-        roi_df = pd.melt(plot_df, id_vars=["date"], 
-                         value_vars=["1y_sector_roi"], var_name='na', value_name='ROI')
-        roi = (
-            alt.Chart(roi_df)
-            .mark_line()
-            .encode(x="date", y="ROI", color=alt.Color('na', legend=alt.Legend(orient="top", title=None)))
-            .properties(title="1Y Sector FoFR")
-            .configure_title(fontSize=14, anchor='middle')
-        )
-        st.altair_chart(roi.interactive(), use_container_width=True)
+        # roi_df = pd.melt(plot_df, id_vars=["date"], 
+        #                  value_vars=["1y_sector_roi"], var_name='na', value_name='ROI')
+        # roi = (
+        #     alt.Chart(roi_df)
+        #     .mark_line()
+        #     .encode(x="date", y="ROI", color=alt.Color('na', legend=alt.Legend(orient="top", title=None)))
+        #     .properties(title="1Y Sector FoFR")
+        #     .configure_title(fontSize=14, anchor='middle')
+        # )
+        # st.altair_chart(roi.interactive(), use_container_width=True)
 
     with col2:
         # pledge_per_qap_df = my_melt(cil_df_historical, cil_df_forecast, 'day_pledge_per_QAP')
