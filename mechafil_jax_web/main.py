@@ -20,6 +20,7 @@ import mechafil_jax.data as data
 import mechafil_jax.sim as sim
 import mechafil_jax.constants as C
 import mechafil_jax.minting as minting
+import mechafil_jax.date_utils as du
 
 def local_css(file_name):
     with open(file_name) as f:
@@ -32,15 +33,18 @@ def get_offline_data(start_date, current_date, end_date):
     offline_data = data.get_simulation_data(PUBLIC_AUTH_TOKEN, start_date, current_date, end_date)
     return offline_data
 
-def plot_panel(results, current_date, baseline):
+def plot_panel(results, baseline, start_date, current_date, end_date):
     # convert results dictionary into a dataframe so that we can use altair to make nice plots
     col1, col2 = st.columns(2)
 
-    plot_df = pd.DataFrame(results)
-    plot_df['date'] = pd.date_range(current_date, periods=len(plot_df), freq='D')
+    plot_df = pd.DataFrame()
+    plot_df['RBP'] = results['rb_total_power_eib']
+    plot_df['QAP'] = results['qa_total_power_eib']
     plot_df['Baseline'] = baseline / C.EIB
-    plot_df['RBP'] = plot_df['rb_total_power_eib']
-    plot_df['QAP'] = plot_df['qa_total_power_eib']
+    plot_df['1y_sector_roi'] = results['1y_sector_roi']
+    plot_df['day_pledge_per_QAP'] = results['day_pledge_per_QAP']
+    plot_df['day_rewards_per_sector'] = results['day_rewards_per_sector']
+    plot_df['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
     
     with col1:
         power_df = pd.melt(plot_df, id_vars=["date"], 
@@ -133,7 +137,7 @@ def forecast_economy():
     )
 
     # plot
-    plot_panel(simulation_results, current_date, baseline)
+    plot_panel(simulation_results, baseline, start_date, current_date, end_date)
     t4 = time.time()
     d.debug(f"Time to forecast: {t4-t3}")
     d.debug(f"Total Time: {t4-t1}")
