@@ -40,7 +40,7 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
     plot_df = pd.DataFrame()
     plot_df['RBP'] = results['rb_total_power_eib']
     plot_df['QAP'] = results['qa_total_power_eib']
-    plot_df['Baseline'] = baseline / C.EIB
+    plot_df['Baseline'] = baseline
     plot_df['1y_sector_roi'] = results['1y_sector_roi']
     plot_df['day_pledge_per_QAP'] = results['day_pledge_per_QAP']
     plot_df['day_rewards_per_sector'] = results['day_rewards_per_sector']
