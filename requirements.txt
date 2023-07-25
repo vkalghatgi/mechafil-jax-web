@@ -9,3 +9,4 @@ scipy
 matplotlib
 mechafil
 mechafil-jax @ git+https://github.com/kkarrancsu/mechafil-jax.git
+scenario-generator @ https://github.com/protocol/scenario-generator.git

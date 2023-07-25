@@ -22,6 +22,8 @@ import mechafil_jax.constants as C
 import mechafil_jax.minting as minting
 import mechafil_jax.date_utils as du
 
+import scenario_generator.utils as u
+
 def local_css(file_name):
     with open(file_name) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
@@ -31,9 +33,19 @@ def local_css(file_name):
 def get_offline_data(start_date, current_date, end_date):
     PUBLIC_AUTH_TOKEN='Bearer ghp_EviOPunZooyAagPPmftIsHfWarumaFOUdBUZ'
     offline_data = data.get_simulation_data(PUBLIC_AUTH_TOKEN, start_date, current_date, end_date)
-    return offline_data
 
-def plot_panel(results, baseline, start_date, current_date, end_date):
+    _, hist_rbp = u.get_historical_daily_onboarded_power(current_date-timedelta(days=180), current_date)
+    _, hist_rr = u.get_historical_renewal_rate(current_date-timedelta(days=180), current_date)
+    _, hist_fpr = u.get_historical_filplus_rate(current_date-timedelta(days=180), current_date)
+
+    smoothed_last_historical_rbp = float(np.median(hist_rbp[-30:]))
+    smoothed_last_historical_rr = float(np.median(hist_rr[-30:]))
+    smoothed_last_historical_fpr = float(np.median(hist_fpr[-30:]))
+
+    return offline_data, smoothed_last_historical_rbp, smoothed_last_historical_rr, smoothed_last_historical_fpr
+
+
+def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, end_date):
     # convert results dictionary into a dataframe so that we can use altair to make nice plots
     col1, col2 = st.columns(2)
 
@@ -107,35 +119,43 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
         )
         st.altair_chart(day_pledge_per_QAP.interactive(), use_container_width=True)
 
-        # TODO: make this into rewards/TIB
-        reward_per_tib_df = pd.melt(plot_df, id_vars=["date"],
-                                    value_vars=["day_rewards_per_TIB"], var_name='na', value_name='FIL')
-        reward_per_tib = (
-            alt.Chart(reward_per_tib_df)
-            .mark_line()
-            .encode(x="date", y="FIL")
-            .properties(title="Reward/TiB")
-            .configure_title(fontSize=14, anchor='middle')
+        # # TODO: make this into rewards/TIB
+        # reward_per_tib_df = pd.melt(plot_df, id_vars=["date"],
+        #                             value_vars=["day_rewards_per_TIB"], var_name='na', value_name='FIL')
+        # reward_per_tib = (
+        #     alt.Chart(reward_per_tib_df)
+        #     .mark_line()
+        #     .encode(x="date", y="FIL")
+        #     .properties(title="Reward/TiB")
+        #     .configure_title(fontSize=14, anchor='middle')
+        # )
+        # st.altair_chart(reward_per_tib.interactive(), use_container_width=True)
+        rewards_table = (
+            alt.Chart(yearly_returns_df)
+            .mark_bar()
+            .encode(
+                x=alt.X('Yr', axis=alt.Axis(title='Year')),
+                y=alt.Y('Cumulative FIL Rewards', axis=alt.Axis(title='Cumulative FIL Rewards (FIL)')),
+                # tooltip=[
+                #     alt.Tooltip("Yr", title="Year"),
+                #     alt.Tooltip("Cumulative FIL Rewards", title="Cumulative FIL Rewards"),
+                # ],
+            )
         )
-        st.altair_chart(reward_per_tib.interactive(), use_container_width=True)
+        st.altair_chart(rewards_table.interactive(), use_container_width=True)
 
-def forecast_economy():
+def forecast_economy(start_date, current_date, end_date, forecast_length_days=365*6):
     t1 = time.time()
     
     rb_onboard_power_pib_day =  st.session_state['rbp_slider']
     renewal_rate_pct = st.session_state['rr_slider']
     fil_plus_rate_pct = st.session_state['fpr_slider']
 
-    forecast_length_days = 365*2  # gets us a 1Y ROI forecast
     sector_duration_days = 360
     
-    current_date = date.today() - timedelta(days=3)
-    start_date = date(current_date.year, current_date.month, 1)
-    end_date = current_date + timedelta(days=forecast_length_days)
-
     # get offline data
     t2 = time.time()
-    offline_data = get_offline_data(start_date, current_date, end_date)
+    offline_data, _, _, _ = get_offline_data(start_date, current_date, end_date)
     t3 = time.time()
     # d.debug(f"Time to get historical data: {t3-t2}")
 
@@ -157,15 +177,26 @@ def forecast_economy():
         sector_duration_days,
         offline_data
     )
-    TIB = 2 ** 40
-    tib_per_sector = TIB / C.SECTOR_SIZE
-    simulation_results['day_rewards_per_TIB'] = simulation_results['day_rewards_per_sector'] * tib_per_sector
+    pib_per_sector = C.PIB / C.SECTOR_SIZE
+    simulation_results['day_rewards_per_PIB'] = simulation_results['day_rewards_per_sector'] * pib_per_sector
     baseline = minting.compute_baseline_power_array(
         np.datetime64(start_date), np.datetime64(end_date), offline_data['init_baseline_eib'],
     )
+    # compute yearly cumulative returns
+    days_1y = 365
+    rpp = jnp.convolve(simulation_results['day_rewards_per_PIB'], jnp.ones(days_1y), mode='full')
+    rpp = rpp[days_1y-1:1-days_1y]  # remove convolution boundaries
+    yearly_returns_df = pd.DataFrame({
+        'Yr': [str(current_date+timedelta(days=365*1)), 
+               str(current_date+timedelta(days=365*2)), 
+               str(current_date+timedelta(days=365*3)),
+               str(current_date+timedelta(days=365*4)),
+               str(current_date+timedelta(days=365*5)),],
+        'Cumulative FIL Rewards': [rpp[days_1y], rpp[days_1y*2], rpp[days_1y*3], rpp[days_1y*4], rpp[days_1y*5]]
+    })
 
     # plot
-    plot_panel(simulation_results, baseline, start_date, current_date, end_date)
+    plot_panel(simulation_results, baseline, yearly_returns_df, start_date, current_date, end_date)
     t4 = time.time()
     # d.debug(f"Time to forecast: {t4-t3}")
     # d.debug(f"Total Time: {t4-t1}")
@@ -176,18 +207,26 @@ def main():
         page_icon="🚀",
         layout="wide",
     )
+    current_date = date.today() - timedelta(days=3)
+    start_date = date(current_date.year, current_date.month, 1)
+    forecast_length_days=365*6
+    end_date = current_date + timedelta(days=forecast_length_days)
+
+    _, smoothed_last_historical_rbp, smoothed_last_historical_rr, smoothed_last_historical_fpr = get_offline_data(start_date, current_date, end_date)
+    smoothed_last_historical_renewal_pct = smoothed_last_historical_rr * 100
+    smoothed_last_historical_fil_plus_pct = smoothed_last_historical_fpr * 100
+
     with st.sidebar:
         st.title('Filecoin Minting Explorer')
 
-        st.slider("Raw Byte Onboarding (PiB/day)", min_value=3., max_value=20., value=6., step=.1, format='%0.02f', key="rbp_slider",
+        st.slider("Raw Byte Onboarding (PiB/day)", min_value=3., max_value=20., value=smoothed_last_historical_rbp, step=.1, format='%0.02f', key="rbp_slider",
                 on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
-        st.slider("Renewal Rate (Percentage)", min_value=10, max_value=99, value=60, step=1, format='%d', key="rr_slider",
+        st.slider("Renewal Rate (Percentage)", min_value=10, max_value=99, value=smoothed_last_historical_renewal_pct, step=1, format='%d', key="rr_slider",
                 on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
-        st.slider("FIL+ Rate (Percentage)", min_value=10, max_value=99, value=70, step=1, format='%d', key="fpr_slider",
+        st.slider("FIL+ Rate (Percentage)", min_value=10, max_value=99, value=smoothed_last_historical_fil_plus_pct, step=1, format='%d', key="fpr_slider",
                 on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
         # st.button("Forecast", on_click=forecast_economy)
 
-    # forecast_economy()
     
     if "debug_string" in st.session_state:
         st.markdown(
