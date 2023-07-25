@@ -27,7 +27,7 @@ import scenario_generator.utils as u
 def local_css(file_name):
     with open(file_name) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-# local_css("debug.css")
+local_css("debug.css")
 
 @st.cache_data
 def get_offline_data(start_date, current_date, end_date):
@@ -215,7 +215,7 @@ def main():
     _, smoothed_last_historical_rbp, smoothed_last_historical_rr, smoothed_last_historical_fpr = get_offline_data(start_date, current_date, end_date)
     smoothed_last_historical_renewal_pct = smoothed_last_historical_rr * 100
     smoothed_last_historical_fil_plus_pct = smoothed_last_historical_fpr * 100
-    print(smoothed_last_historical_rbp, smoothed_last_historical_renewal_pct, smoothed_last_historical_fil_plus_pct)
+    d.debug('rbp:%0.02f, rr:%0.02f, fpr:%0.02f' % (smoothed_last_historical_rbp, smoothed_last_historical_rr, smoothed_last_historical_fpr))
 
     with st.sidebar:
         st.title('Filecoin Minting Explorer')
