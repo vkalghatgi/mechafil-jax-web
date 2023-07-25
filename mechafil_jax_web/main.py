@@ -88,6 +88,7 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
                     alt.Tooltip("FoFR", title="FoFR"),
                 ]
             )
+            .add_selection(hover)
             .properties(title="1Y Sector FoFR")
             .configure_title(fontSize=14, anchor='middle')
         )
@@ -182,7 +183,7 @@ def main():
         # st.button("Forecast", on_click=forecast_economy)
 
     # forecast_economy()
-
+    
     if "debug_string" in st.session_state:
         st.markdown(
             f'<div class="debug">{ st.session_state["debug_string"]}</div>',
