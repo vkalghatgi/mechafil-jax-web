@@ -213,9 +213,9 @@ def main():
     end_date = current_date + timedelta(days=forecast_length_days)
 
     _, smoothed_last_historical_rbp, smoothed_last_historical_rr, smoothed_last_historical_fpr = get_offline_data(start_date, current_date, end_date)
-    smoothed_last_historical_renewal_pct = smoothed_last_historical_rr * 100
-    smoothed_last_historical_fil_plus_pct = smoothed_last_historical_fpr * 100
-    d.debug('rbp:%0.02f, rr:%0.02f, fpr:%0.02f' % (smoothed_last_historical_rbp, smoothed_last_historical_rr, smoothed_last_historical_fpr))
+    smoothed_last_historical_renewal_pct = int(smoothed_last_historical_rr * 100)
+    smoothed_last_historical_fil_plus_pct = int(smoothed_last_historical_fpr * 100)
+    d.debug('rbp:%0.02f, rr:%d, fpr:%d' % (smoothed_last_historical_rbp, smoothed_last_historical_rr, smoothed_last_historical_fpr))
 
     with st.sidebar:
         st.title('Filecoin Minting Explorer')
