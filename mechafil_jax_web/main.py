@@ -138,9 +138,9 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
     with col3:
         yr_returns = (
             alt.Chart(yearly_returns_df)
+            .encode(x='date', y='FIL', text='FIL')
             .mark_bar()
-            # .mark_text(dy=-5)
-            .encode(x='date', y='FIL')
+            .mark_text(align='top', dy=-5)
             .properties(title="1Y Returns/PiB")
             .configure_title(fontSize=14, anchor='middle')
         )
