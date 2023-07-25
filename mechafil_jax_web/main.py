@@ -49,11 +49,15 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
     # convert results dictionary into a dataframe so that we can use altair to make nice plots
     col1, col2, col3 = st.columns(3)
 
-    plot_df = pd.DataFrame()
-    plot_df['RBP'] = results['rb_total_power_eib']
-    plot_df['QAP'] = results['qa_total_power_eib']
-    plot_df['Baseline'] = baseline
-    plot_df['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
+    power_dff = pd.DataFrame()
+    power_dff['RBP'] = results['rb_total_power_eib']
+    power_dff['QAP'] = results['qa_total_power_eib']
+    power_dff['Baseline'] = baseline
+    power_dff['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
+
+    minting_dff = pd.DataFrame()
+    minting_dff['minting_rate'] = results['day_network_reward']
+    minting_dff['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
 
     returns_per_pib_dff = pd.DataFrame()
     returns_per_pib_dff['1y_return_per_pib'] = results['1y_return_per_pib']
@@ -75,13 +79,14 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
     )
     
     with col1:
-        power_df = pd.melt(plot_df, id_vars=["date"], 
+        power_df = pd.melt(power_dff, id_vars=["date"], 
                            value_vars=["Baseline", "RBP", "QAP"], var_name='Power', value_name='EIB')
         power_df['EIB'] = power_df['EIB']
         power = (
             alt.Chart(power_df)
             .mark_line()
-            .encode(x="date", y=alt.Y("EIB").scale(type='log'), color=alt.Color('Power', legend=alt.Legend(orient="top", title=None)))
+            .encode(x=alt.X("date", axis=alt.Axis(labelAngle=-45)), 
+                    y=alt.Y("EIB").scale(type='log'), color=alt.Color('Power', legend=alt.Legend(orient="top", title=None)))
             .properties(title="Network Power")
             .configure_title(fontSize=14, anchor='middle')
         )
@@ -115,28 +120,42 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         day_pledge_per_QAP = (
             alt.Chart(pledge_per_qap_df)
             .mark_line()
-            .encode(x="date", y="FIL")
+            .encode(x=alt.X("date", axis=alt.Axis(labelAngle=-45)), 
+                    y="FIL")
             .properties(title="Pledge/32GiB QAP")
             .configure_title(fontSize=14, anchor='middle')
         )
         st.altair_chart(day_pledge_per_QAP.interactive(), use_container_width=True)
 
-        # TODO: make this into rewards/TIB
         returns_per_pib_df = pd.melt(returns_per_pib_dff, id_vars=["date"],
                                     value_vars=["1y_return_per_pib"], var_name='na', value_name='FIL')
         reward_per_pib = (
             alt.Chart(returns_per_pib_df)
             .mark_line()
-            .encode(x="date", y="FIL")
+            .encode(x=alt.X("date", axis=alt.Axis(labelAngle=-45)), 
+                    y="FIL")
             .properties(title="1Y Returns/PiB")
             .configure_title(fontSize=14, anchor='middle')
         )
         st.altair_chart(reward_per_pib.interactive(), use_container_width=True)
 
     with col3:
+        minting_df = pd.melt(minting_dff, id_vars=["date"],
+                             value_vars=["minting_rate"], var_name='na', value_name='FILRate')
+        minting = (
+            alt.Chart(minting_df)
+            .mark_line()
+            .encode(x=alt.X("date", axis=alt.Axis(labelAngle=-45)), 
+                    y=alt.Y("FILRate", text="FIL/day"))
+            .properties(title="Minting Rate")
+            .configure_title(fontSize=14, anchor='middle')
+        )
+        st.altair_chart(minting.interactive(), use_container_width=True)
+
         yr_returns = (
             alt.Chart(yearly_returns_df)
-            .encode(x='date', y='FIL', text='FIL')
+            .encode(x=alt.X("date", axis=alt.Axis(labelAngle=-45)), 
+                    y='FIL', text='FIL')
             .mark_bar()
             # .mark_text(align='center', dy=-5)
             .properties(title="1Y Returns/PiB")
