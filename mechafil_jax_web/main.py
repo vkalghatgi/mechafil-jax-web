@@ -220,13 +220,13 @@ def main():
     with st.sidebar:
         st.title('Filecoin Minting Explorer')
 
-        st.slider("Raw Byte Onboarding (PiB/day)", min_value=3., max_value=20., value=smoothed_last_historical_rbp, step=.1, format='%0.02f', key="rbp_slider",
+        st.slider("Raw Byte Onboarding (PiB/day)", min_value=3., max_value=50., value=smoothed_last_historical_rbp, step=.1, format='%0.02f', key="rbp_slider",
                 on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
         st.slider("Renewal Rate (Percentage)", min_value=10, max_value=99, value=smoothed_last_historical_renewal_pct, step=1, format='%d', key="rr_slider",
                 on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
         st.slider("FIL+ Rate (Percentage)", min_value=10, max_value=99, value=smoothed_last_historical_fil_plus_pct, step=1, format='%d', key="fpr_slider",
                 on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
-        # st.button("Forecast", on_click=forecast_economy)
+        st.button("Forecast", on_click=forecast_economy)
 
     
     if "debug_string" in st.session_state:
