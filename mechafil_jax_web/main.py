@@ -85,7 +85,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         power = (
             alt.Chart(power_df)
             .mark_line()
-            .encode(x=alt.X("date", axis=alt.Axis(labelAngle=-45)), 
+            .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
                     y=alt.Y("EIB").scale(type='log'), color=alt.Color('Power', legend=alt.Legend(orient="top", title=None)))
             .properties(title="Network Power")
             .configure_title(fontSize=14, anchor='middle')
@@ -99,7 +99,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         roi = (
             alt.Chart(roi_df)
             .mark_line()
-            .encode(x=alt.X("date", axis=alt.Axis(labelAngle=-45)), 
+            .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
                     y="%", 
                     # opacity=alt.condition(hover, alt.value(0.3), alt.value(0)), 
                     # tooltip=[
@@ -120,7 +120,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         day_pledge_per_QAP = (
             alt.Chart(pledge_per_qap_df)
             .mark_line()
-            .encode(x=alt.X("date", axis=alt.Axis(labelAngle=-45)), 
+            .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
                     y="FIL")
             .properties(title="Pledge/32GiB QAP")
             .configure_title(fontSize=14, anchor='middle')
@@ -132,7 +132,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         reward_per_pib = (
             alt.Chart(returns_per_pib_df)
             .mark_line()
-            .encode(x=alt.X("date", axis=alt.Axis(labelAngle=-45)), 
+            .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
                     y="FIL")
             .properties(title="1Y Returns/PiB")
             .configure_title(fontSize=14, anchor='middle')
@@ -154,7 +154,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
 
         yr_returns = (
             alt.Chart(yearly_returns_df)
-            .encode(x=alt.X("date", axis=alt.Axis(labelAngle=-45)), 
+            .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
                     y='FIL', text='FIL')
             .mark_bar()
             # .mark_text(align='center', dy=-5)
