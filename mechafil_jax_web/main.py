@@ -144,7 +144,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         )
         st.altair_chart(rewards_table.interactive(), use_container_width=True)
 
-def forecast_economy(start_date, current_date, end_date, forecast_length_days=365*6):
+def forecast_economy(start_date=None, current_date=None, end_date=None, forecast_length_days=365*6):
     t1 = time.time()
     
     rb_onboard_power_pib_day =  st.session_state['rbp_slider']
@@ -211,6 +211,12 @@ def main():
     start_date = date(current_date.year, current_date.month, 1)
     forecast_length_days=365*6
     end_date = current_date + timedelta(days=forecast_length_days)
+    forecast_kwargs = {
+        'start_date': start_date,
+        'current_date': current_date,
+        'end_date': end_date,
+        'forecast_length_days': forecast_length_days,
+    }
 
     _, smoothed_last_historical_rbp, smoothed_last_historical_rr, smoothed_last_historical_fpr = get_offline_data(start_date, current_date, end_date)
     smoothed_last_historical_renewal_pct = int(smoothed_last_historical_rr * 100)
@@ -221,12 +227,12 @@ def main():
         st.title('Filecoin Minting Explorer')
 
         st.slider("Raw Byte Onboarding (PiB/day)", min_value=3., max_value=50., value=smoothed_last_historical_rbp, step=.1, format='%0.02f', key="rbp_slider",
-                on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
+                on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
         st.slider("Renewal Rate (Percentage)", min_value=10, max_value=99, value=smoothed_last_historical_renewal_pct, step=1, format='%d', key="rr_slider",
-                on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
+                on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
         st.slider("FIL+ Rate (Percentage)", min_value=10, max_value=99, value=smoothed_last_historical_fil_plus_pct, step=1, format='%d', key="fpr_slider",
-                on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
-        st.button("Forecast", on_click=forecast_economy)
+                on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
+        st.button("Forecast", on_click=forecast_economy, kwargs=forecast_kwargs, key="forecast_button")
 
     
     if "debug_string" in st.session_state:
