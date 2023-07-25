@@ -138,11 +138,12 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
     with col3:
         yr_returns = (
             alt.Chart(yearly_returns_df)
+            .mark_bar()
+            .mark_text(dy=-5)
             .encode(x='date', y='FIL')
             .properties(title="1Y Returns/PiB")
             .configure_title(fontSize=14, anchor='middle')
         )
-        yr_returns = yr_returns.mark_bar() + yr_returns.mark_text(align='left', dx=2)
         st.altair_chart(yr_returns.interactive(), use_container_width=True)
 
 def forecast_economy(start_date=None, current_date=None, end_date=None, forecast_length_days=365*6):
