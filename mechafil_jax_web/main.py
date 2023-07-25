@@ -50,7 +50,7 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
     pledge_dff['date'] = pd.to_datetime(du.get_t(start_date+timedelta(days=1), forecast_length=pledge_dff.shape[0]))
 
     roi_dff = pd.DataFrame()
-    roi_dff['1y_sector_fofr'] = results['1y_sector_roi'][1:]
+    roi_dff['1y_sector_fofr'] = results['1y_sector_roi'][1:] * 100
     roi_dff['date'] = pd.to_datetime(du.get_t(start_date+timedelta(days=1), forecast_length=roi_dff.shape[0]))
     # d.debug(results['1y_sector_roi'])
 
@@ -74,12 +74,14 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
         )
         st.altair_chart(power.interactive(), use_container_width=True) 
 
+        # NOTE: adding the tooltip here causes the chart to not render for some reason
+        # Following the directions here: https://docs.streamlit.io/library/api-reference/charts/st.altair_chart
         roi_df = pd.melt(roi_dff, id_vars=["date"], 
-                         value_vars=["1y_sector_fofr"], var_name='na', value_name='FoFR')
+                         value_vars=["1y_sector_fofr"], var_name='na', value_name='%')
         roi = (
             alt.Chart(roi_df)
             .mark_line()
-            .encode(x="date", y="FoFR", 
+            .encode(x="date", y="%", 
                     # opacity=alt.condition(hover, alt.value(0.3), alt.value(0)), 
                     # tooltip=[
                     #     alt.Tooltip("date", title="Date"),
@@ -90,20 +92,6 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
             .configure_title(fontSize=14, anchor='middle')
             # .add_params(hover)
         )
-        # tooltip = (
-        #     alt.Chart(roi_df)
-        #     .mark_rule()
-        #     .encode(
-        #         x="yearmonthdate(date)",
-        #         y="FoFR",
-        #         opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
-        #         tooltip=[
-        #             alt.Tooltip("date", title="Date"),
-        #             alt.Tooltip("FoFR", title="FoFR"),
-        #         ],
-        #     )
-        #     .add_selection(hover)
-        # )
         st.altair_chart(roi.interactive(), use_container_width=True)
 
     with col2:
