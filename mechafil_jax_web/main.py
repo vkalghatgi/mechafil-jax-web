@@ -79,7 +79,8 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
         roi = (
             alt.Chart(roi_df)
             .mark_line()
-            .encode(x="date", y="FoFR", opacity=alt.condition(hover, alt.value(0.3), alt.value(0)), 
+            .encode(x="date", y="FoFR", 
+                    # opacity=alt.condition(hover, alt.value(0.3), alt.value(0)), 
                     # tooltip=[
                     #     alt.Tooltip("date", title="Date"),
                     #     alt.Tooltip("FoFR", title="FoFR"),
