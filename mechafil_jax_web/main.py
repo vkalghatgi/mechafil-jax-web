@@ -164,7 +164,7 @@ def main():
                 on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
         st.slider("FIL+ Rate (Percentage)", min_value=10, max_value=99, value=70, step=1, format='%d', key="fpr_slider",
                 on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
-        st.button("Forecast", on_click=forecast_economy)
+        # st.button("Forecast", on_click=forecast_economy)
 
     forecast_economy()
 
