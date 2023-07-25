@@ -84,7 +84,6 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
                         alt.Tooltip("date", title="Date"),
                         alt.Tooltip("FoFR", title="FoFR"),
                     ],)
-            .add_selection(hover)
             .properties(title="1Y Sector FoFR")
             .configure_title(fontSize=14, anchor='middle')
         )
