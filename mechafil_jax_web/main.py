@@ -155,17 +155,18 @@ def forecast_economy():
     # d.debug(f"Total Time: {t4-t1}")
 
 def main():
-    st.title('Filecoin Minting Explorer')
+    with st.sidebar:
+        st.title('Filecoin Minting Explorer')
 
-    st.slider("Raw Byte Onboarding (PiB/day)", min_value=3., max_value=20., value=6., step=.1, format='%0.02f', key="rbp_slider",
-              on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
-    st.slider("Renewal Rate (Percentage)", min_value=10, max_value=99, value=60, step=1, format='%d', key="rr_slider",
-              on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
-    st.slider("FIL+ Rate (Percentage)", min_value=10, max_value=99, value=70, step=1, format='%d', key="fpr_slider",
-              on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
-    st.button("Forecast", on_click=forecast_economy)
+        st.slider("Raw Byte Onboarding (PiB/day)", min_value=3., max_value=20., value=6., step=.1, format='%0.02f', key="rbp_slider",
+                on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
+        st.slider("Renewal Rate (Percentage)", min_value=10, max_value=99, value=60, step=1, format='%d', key="rr_slider",
+                on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
+        st.slider("FIL+ Rate (Percentage)", min_value=10, max_value=99, value=70, step=1, format='%d', key="fpr_slider",
+                on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
+        st.button("Forecast", on_click=forecast_economy)
 
-    # forecast_economy()
+    forecast_economy()
 
     if "debug_string" in st.session_state:
         st.markdown(
