@@ -190,11 +190,11 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
                str(current_date+timedelta(days=365*3)),
                str(current_date+timedelta(days=365*4)),
                str(current_date+timedelta(days=365*5)),],
-        'FIL': [rpp[days_1y], 
-                rpp[days_1y*2], 
-                rpp[days_1y*3], 
-                rpp[days_1y*4], 
-                rpp[days_1y*5]
+        'FIL': [float(rpp[days_1y]), 
+                float(rpp[days_1y*2]),  
+                float(rpp[days_1y*3]), 
+                float(rpp[days_1y*4]), 
+                float(rpp[days_1y*5]), 
                 ]
     })
 
