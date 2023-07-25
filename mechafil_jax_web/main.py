@@ -171,6 +171,11 @@ def forecast_economy():
     # d.debug(f"Total Time: {t4-t1}")
 
 def main():
+    st.set_page_config(
+        page_title="Filecoin Minting Explorer",
+        page_icon="🚀",
+        layout="wide",
+    )
     with st.sidebar:
         st.title('Filecoin Minting Explorer')
 
