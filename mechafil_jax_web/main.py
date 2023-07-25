@@ -27,7 +27,7 @@ import scenario_generator.utils as u
 def local_css(file_name):
     with open(file_name) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-local_css("debug.css")
+# local_css("debug.css")
 
 @st.cache_data
 def get_offline_data(start_date, current_date, end_date):
@@ -47,7 +47,7 @@ def get_offline_data(start_date, current_date, end_date):
 
 def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, end_date):
     # convert results dictionary into a dataframe so that we can use altair to make nice plots
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     plot_df = pd.DataFrame()
     plot_df['RBP'] = results['rb_total_power_eib']
@@ -134,23 +134,13 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
             .configure_title(fontSize=14, anchor='middle')
         )
         st.altair_chart(reward_per_tib.interactive(), use_container_width=True)
-        # rewards_table = (
-        #     alt.Chart(yearly_returns_df)
-        #     .mark_bar()
-        #     .encode(
-        #         # x=alt.X('Yr', axis=alt.Axis(title='Year')),
-        #         # y=alt.Y('Cumulative FIL Rewards', axis=alt.Axis(title='FIL')),
-        #         # tooltip=[
-        #         #     alt.Tooltip("Yr", title="Year"),
-        #         #     alt.Tooltip("Cumulative FIL Rewards", title="Cumulative FIL Rewards"),
-        #         # ],
-        #         x='Yr',
-        #         y='FIL',
-        #     )
-        #     .properties(title="Cumulative Rewards/PiB")
-        #     .configure_title(fontSize=14, anchor='middle')
-        # )
-        # st.altair_chart(rewards_table.interactive(), use_container_width=True)
+
+    with col3:
+        yr_returns = alt.Chart(yearly_returns_df).mark_bar().encode(
+            x='date',
+            y='FIL'
+        )
+        st.altair_chart(yr_returns.interactive(), use_container_width=True)
 
 def forecast_economy(start_date=None, current_date=None, end_date=None, forecast_length_days=365*6):
     t1 = time.time()
@@ -193,20 +183,20 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
     # compute yearly cumulative returns
     rpp = simulation_results['1y_return_per_sector'] * pib_per_sector
     simulation_results['1y_return_per_pib'] = rpp
-    # yearly_returns_df = pd.DataFrame({
-    #     'Yr': [str(current_date+timedelta(days=365*1)), 
-    #            str(current_date+timedelta(days=365*2)), 
-    #            str(current_date+timedelta(days=365*3)),
-    #            str(current_date+timedelta(days=365*4)),
-    #            str(current_date+timedelta(days=365*5)),],
-    #     'FIL': [rpp[days_1y], 
-    #             rpp[days_1y*2], 
-    #             rpp[days_1y*3], 
-    #             rpp[days_1y*4], 
-    #             rpp[days_1y*5]
-    #             ]
-    # })
-    yearly_returns_df = pd.DataFrame()
+    days_1y = 365
+    yearly_returns_df = pd.DataFrame({
+        'date': [str(current_date+timedelta(days=365*1)), 
+               str(current_date+timedelta(days=365*2)), 
+               str(current_date+timedelta(days=365*3)),
+               str(current_date+timedelta(days=365*4)),
+               str(current_date+timedelta(days=365*5)),],
+        'FIL': [rpp[days_1y], 
+                rpp[days_1y*2], 
+                rpp[days_1y*3], 
+                rpp[days_1y*4], 
+                rpp[days_1y*5]
+                ]
+    })
 
     # plot
     plot_panel(simulation_results, baseline, yearly_returns_df, start_date, current_date, end_date)
@@ -215,11 +205,11 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
     # d.debug(f"Total Time: {t4-t1}")
 
 def main():
-    # st.set_page_config(
-    #     page_title="Filecoin Minting Explorer",
-    #     page_icon="🚀",
-    #     layout="wide",
-    # )
+    st.set_page_config(
+        page_title="Filecoin Minting Explorer",
+        page_icon="🚀",
+        layout="wide",
+    )
     current_date = date.today() - timedelta(days=3)
     start_date = date(current_date.year, current_date.month, 1)
     forecast_length_days=365*6
@@ -235,9 +225,9 @@ def main():
     smoothed_last_historical_renewal_pct = int(smoothed_last_historical_rr * 100)
     smoothed_last_historical_fil_plus_pct = int(smoothed_last_historical_fpr * 100)
     # d.debug('rbp:%0.02f, rr:%d, fpr:%d' % (smoothed_last_historical_rbp, smoothed_last_historical_rr, smoothed_last_historical_fpr))
-    d.debug(smoothed_last_historical_rbp)
-    d.debug(smoothed_last_historical_renewal_pct)
-    d.debug(smoothed_last_historical_fil_plus_pct)
+    # d.debug(smoothed_last_historical_rbp)
+    # d.debug(smoothed_last_historical_renewal_pct)
+    # d.debug(smoothed_last_historical_fil_plus_pct)
 
     with st.sidebar:
         st.title('Filecoin Minting Explorer')
