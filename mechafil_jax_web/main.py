@@ -166,7 +166,7 @@ def main():
                 on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
         # st.button("Forecast", on_click=forecast_economy)
 
-    forecast_economy()
+    # forecast_economy()
 
     if "debug_string" in st.session_state:
         st.markdown(
