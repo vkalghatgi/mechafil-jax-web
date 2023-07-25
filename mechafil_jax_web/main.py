@@ -42,7 +42,7 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
     plot_df['QAP'] = results['qa_total_power_eib']
     plot_df['Baseline'] = baseline
     # plot_df['day_pledge_per_QAP'] = results['day_pledge_per_QAP']
-    plot_df['day_rewards_per_sector'] = results['day_rewards_per_sector']
+    plot_df['day_rewards_per_TIB'] = results['day_rewards_per_TIB']
     plot_df['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
 
     pledge_dff = pd.DataFrame()
@@ -92,16 +92,16 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
         st.altair_chart(day_pledge_per_QAP.interactive(), use_container_width=True)
 
         # TODO: make this into rewards/TIB
-        reward_per_sector_df = pd.melt(plot_df, id_vars=["date"],
-                                    value_vars=["day_rewards_per_sector"], var_name='na', value_name='FIL')
-        reward_per_sector = (
-            alt.Chart(reward_per_sector_df)
+        reward_per_tib_df = pd.melt(plot_df, id_vars=["date"],
+                                    value_vars=["day_rewards_per_TIB"], var_name='na', value_name='FIL')
+        reward_per_tib = (
+            alt.Chart(reward_per_tib_df)
             .mark_line()
             .encode(x="date", y="FIL")
-            .properties(title="Reward/32GiB Sector")
+            .properties(title="Reward/TiB")
             .configure_title(fontSize=14, anchor='middle')
         )
-        st.altair_chart(reward_per_sector.interactive(), use_container_width=True)
+        st.altair_chart(reward_per_tib.interactive(), use_container_width=True)
 
 def forecast_economy():
     t1 = time.time()
@@ -141,6 +141,9 @@ def forecast_economy():
         sector_duration_days,
         offline_data
     )
+    TIB = 2 ** 40
+    tib_per_sector = TIB / C.SECTOR_SIZE
+    simulation_results['day_rewards_per_TIB'] = simulation_results['day_rewards_per_sector'] * tib_per_sector
     baseline = minting.compute_baseline_power_array(
         np.datetime64(start_date), np.datetime64(end_date), offline_data['init_baseline_eib'],
     )
@@ -152,7 +155,7 @@ def forecast_economy():
     d.debug(f"Total Time: {t4-t1}")
 
 def main():
-    st.title('Filecoin Economy Forecaster')
+    st.title('Filecoin Minting Explorer')
 
     st.slider("Raw Byte Onboarding (PiB/day)", min_value=3., max_value=20., value=6., step=.1, format='%0.02f', key="rbp_slider",
               on_change=forecast_economy, kwargs=None, disabled=False, label_visibility="visible")
