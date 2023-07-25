@@ -53,6 +53,13 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
     roi_dff['1y_sector_fofr'] = results['1y_sector_roi'][1:]
     roi_dff['date'] = pd.to_datetime(du.get_t(start_date+timedelta(days=1), forecast_length=roi_dff.shape[0]))
     # d.debug(results['1y_sector_roi'])
+
+    hover = alt.selection_single(
+        fields=["date"],
+        nearest=True,
+        on="mouseover",
+        empty="none",
+    )
     
     with col1:
         power_df = pd.melt(plot_df, id_vars=["date"], 
@@ -71,8 +78,16 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
                          value_vars=["1y_sector_fofr"], var_name='na', value_name='ROI')
         roi = (
             alt.Chart(roi_df)
-            .mark_line()
-            .encode(x="date", y="ROI")
+            .mark_rule()
+            .encode(
+                x="date", 
+                y="ROI",
+                opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
+                tooltip=[
+                    alt.Tooltip("date", title="Date"),
+                    alt.Tooltip("1y_sector_fofr", title="FoFR"),
+                ]
+            )
             .properties(title="1Y Sector FoFR")
             .configure_title(fontSize=14, anchor='middle')
         )
