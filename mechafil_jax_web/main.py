@@ -52,7 +52,7 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
     roi_dff = pd.DataFrame()
     roi_dff['1y_sector_fofr'] = results['1y_sector_roi'][1:]
     roi_dff['date'] = pd.to_datetime(du.get_t(start_date+timedelta(days=1), forecast_length=roi_dff.shape[0]))
-    d.debug(results['1y_sector_roi'])
+    # d.debug(results['1y_sector_roi'])
     
     with col1:
         power_df = pd.melt(plot_df, id_vars=["date"], 
@@ -121,7 +121,7 @@ def forecast_economy():
     t2 = time.time()
     offline_data = get_offline_data(start_date, current_date, end_date)
     t3 = time.time()
-    d.debug(f"Time to get historical data: {t3-t2}")
+    # d.debug(f"Time to get historical data: {t3-t2}")
 
     # run simulation
     rbp = jnp.ones(forecast_length_days) * rb_onboard_power_pib_day
@@ -151,8 +151,8 @@ def forecast_economy():
     # plot
     plot_panel(simulation_results, baseline, start_date, current_date, end_date)
     t4 = time.time()
-    d.debug(f"Time to forecast: {t4-t3}")
-    d.debug(f"Total Time: {t4-t1}")
+    # d.debug(f"Time to forecast: {t4-t3}")
+    # d.debug(f"Total Time: {t4-t1}")
 
 def main():
     st.title('Filecoin Minting Explorer')
