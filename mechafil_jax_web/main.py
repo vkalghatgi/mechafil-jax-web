@@ -75,17 +75,17 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
         st.altair_chart(power.interactive(), use_container_width=True) 
 
         roi_df = pd.melt(roi_dff, id_vars=["date"], 
-                         value_vars=["1y_sector_fofr"], var_name='na', value_name='ROI')
+                         value_vars=["1y_sector_fofr"], var_name='na', value_name='FoFR')
         roi = (
             alt.Chart(roi_df)
             .mark_rule()
             .encode(
                 x="date", 
-                y="ROI",
+                y="FoFR",
                 opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
                 tooltip=[
                     alt.Tooltip("date", title="Date"),
-                    alt.Tooltip("1y_sector_fofr", title="FoFR"),
+                    alt.Tooltip("FoFR", title="FoFR"),
                 ]
             )
             .properties(title="1Y Sector FoFR")
