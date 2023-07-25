@@ -79,25 +79,30 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
         roi = (
             alt.Chart(roi_df)
             .mark_line()
-            .encode(x="date", y="FoFR")
+            .encode(x="date", y="FoFR", opacity=alt.condition(hover, alt.value(0.3), alt.value(0)), 
+                    tooltip=[
+                        alt.Tooltip("date", title="Date"),
+                        alt.Tooltip("FoFR", title="FoFR"),
+                    ],)
+            .add_selection(hover)
             .properties(title="1Y Sector FoFR")
             .configure_title(fontSize=14, anchor='middle')
         )
-        tooltip = (
-            alt.Chart(roi_df)
-            .mark_rule()
-            .encode(
-                x="yearmonthdate(date)",
-                y="FoFR",
-                opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
-                tooltip=[
-                    alt.Tooltip("date", title="Date"),
-                    alt.Tooltip("FoFR", title="FoFR"),
-                ],
-            )
-            .add_selection(hover)
-        )
-        st.altair_chart((roi+tooltip).interactive(), use_container_width=True)
+        # tooltip = (
+        #     alt.Chart(roi_df)
+        #     .mark_rule()
+        #     .encode(
+        #         x="yearmonthdate(date)",
+        #         y="FoFR",
+        #         opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
+        #         tooltip=[
+        #             alt.Tooltip("date", title="Date"),
+        #             alt.Tooltip("FoFR", title="FoFR"),
+        #         ],
+        #     )
+        #     .add_selection(hover)
+        # )
+        st.altair_chart(roi.interactive(), use_container_width=True)
 
     with col2:
         # pledge_per_qap_df = my_melt(cil_df_historical, cil_df_forecast, 'day_pledge_per_QAP')
