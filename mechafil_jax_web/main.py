@@ -206,17 +206,22 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
     simulation_results['1y_return_per_pib'] = rpp
     days_1y = 365
     yearly_returns_df = pd.DataFrame({
-        'date': [str(current_date+timedelta(days=365*1)), 
-               str(current_date+timedelta(days=365*2)), 
-               str(current_date+timedelta(days=365*3)),
-               str(current_date+timedelta(days=365*4)),
-               str(current_date+timedelta(days=365*5)),],
-        'FIL': [float(rpp[days_1y]), 
-                float(rpp[days_1y*2]),  
-                float(rpp[days_1y*3]), 
-                float(rpp[days_1y*4]), 
-                float(rpp[days_1y*5]), 
-                ]
+        'date': [
+            str(current_date), 
+            str(current_date+timedelta(days=365*1)), 
+            str(current_date+timedelta(days=365*2)), 
+            str(current_date+timedelta(days=365*3)),
+            str(current_date+timedelta(days=365*4)),
+            str(current_date+timedelta(days=365*5)),
+        ],
+        'FIL': [
+            float(rpp[0]), 
+            float(rpp[days_1y]), 
+            float(rpp[days_1y*2]),  
+            float(rpp[days_1y*3]), 
+            float(rpp[days_1y*4]), 
+            float(rpp[days_1y*5]), 
+        ]
     })
 
     # plot
