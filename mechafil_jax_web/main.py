@@ -126,20 +126,23 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         # TODO: make this into rewards/TIB
         returns_per_pib_df = pd.melt(returns_per_pib_dff, id_vars=["date"],
                                     value_vars=["1y_return_per_pib"], var_name='na', value_name='FIL')
-        reward_per_tib = (
+        reward_per_pib = (
             alt.Chart(returns_per_pib_df)
             .mark_line()
             .encode(x="date", y="FIL")
             .properties(title="1Y Returns/PiB")
             .configure_title(fontSize=14, anchor='middle')
         )
-        st.altair_chart(reward_per_tib.interactive(), use_container_width=True)
+        st.altair_chart(reward_per_pib.interactive(), use_container_width=True)
 
     with col3:
-        yr_returns = alt.Chart(yearly_returns_df).mark_bar().encode(
-            x='date',
-            y='FIL'
+        yr_returns = (
+            alt.Chart(yearly_returns_df)
+            .encode(x='date', y='FIL')
+            .properties(title="1Y Returns/PiB")
+            .configure_title(fontSize=14, anchor='middle')
         )
+        yr_returns = yr_returns.mark_bar() + yr_returns.mark_text(align='left', dx=2)
         st.altair_chart(yr_returns.interactive(), use_container_width=True)
 
 def forecast_economy(start_date=None, current_date=None, end_date=None, forecast_length_days=365*6):
