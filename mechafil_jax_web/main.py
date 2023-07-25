@@ -129,7 +129,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         reward_per_pib = (
             alt.Chart(returns_per_pib_df)
             .mark_line()
-            .encode(x="date:0", y="FIL")
+            .encode(x="date:O", y="FIL")
             .properties(title="1Y Returns/PiB")
             .configure_title(fontSize=14, anchor='middle')
         )
