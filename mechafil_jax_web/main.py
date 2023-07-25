@@ -86,7 +86,7 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
                     ],)
             .properties(title="1Y Sector FoFR")
             .configure_title(fontSize=14, anchor='middle')
-            .add_selection(hover)
+            .add_params(hover)
         )
         # tooltip = (
         #     alt.Chart(roi_df)
