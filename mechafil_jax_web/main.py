@@ -25,7 +25,7 @@ import mechafil_jax.date_utils as du
 def local_css(file_name):
     with open(file_name) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-local_css("debug.css")
+# local_css("debug.css")
 
 @st.cache_data
 def get_offline_data(start_date, current_date, end_date):
