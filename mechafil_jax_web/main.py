@@ -54,7 +54,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
     plot_df['QAP'] = results['qa_total_power_eib']
     plot_df['Baseline'] = baseline
     # plot_df['day_pledge_per_QAP'] = results['day_pledge_per_QAP']
-    plot_df['day_rewards_per_TIB'] = results['day_rewards_per_TIB']
+    # plot_df['day_rewards_per_TIB'] = results['day_rewards_per_TIB']
     plot_df['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
 
     pledge_dff = pd.DataFrame()
