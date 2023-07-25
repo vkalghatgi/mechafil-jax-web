@@ -84,7 +84,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         power = (
             alt.Chart(power_df)
             .mark_line()
-            .encode(x="date", y="EIB", color=alt.Color('Power', legend=alt.Legend(orient="top", title=None)))
+            .encode(x="date", y="EIB", color=alt.Color('Power', legend=alt.Legend(orient="top", title=None), scale=alt.Scale(scheme='logarithmic')))
             .properties(title="Network Power")
             .configure_title(fontSize=14, anchor='middle')
         )
