@@ -232,7 +232,7 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
 
 def main():
     st.set_page_config(
-        page_title="Filecoin Minting Explorer",
+        page_title="Filecoin Economics Explorer",
         page_icon="🚀",
         layout="wide",
     )
@@ -256,7 +256,7 @@ def main():
     # d.debug(smoothed_last_historical_fil_plus_pct)
 
     with st.sidebar:
-        st.title('Filecoin Minting Explorer')
+        st.title('Filecoin Economics Explorer')
 
         st.slider("Raw Byte Onboarding (PiB/day)", min_value=3., max_value=50., value=smoothed_last_historical_rbp, step=.1, format='%0.02f', key="rbp_slider",
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
