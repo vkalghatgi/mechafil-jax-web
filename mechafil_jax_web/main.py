@@ -57,6 +57,10 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
     # plot_df['day_rewards_per_TIB'] = results['day_rewards_per_TIB']
     plot_df['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
 
+    rewards_per_pib_dff = pd.DataFrame()
+    rewards_per_pib_dff['cum_rewards_per_pib'] = results['cum_rewards_per_pib']
+    rewards_per_pib_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=rewards_per_pib_dff.shape[0]))
+
     pledge_dff = pd.DataFrame()
     pledge_dff['day_pledge_per_QAP'] = results['day_pledge_per_QAP'][1:]
     pledge_dff['date'] = pd.to_datetime(du.get_t(start_date+timedelta(days=1), forecast_length=pledge_dff.shape[0]))
@@ -119,34 +123,34 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         )
         st.altair_chart(day_pledge_per_QAP.interactive(), use_container_width=True)
 
-        # # TODO: make this into rewards/TIB
-        # reward_per_tib_df = pd.melt(plot_df, id_vars=["date"],
-        #                             value_vars=["day_rewards_per_TIB"], var_name='na', value_name='FIL')
-        # reward_per_tib = (
-        #     alt.Chart(reward_per_tib_df)
-        #     .mark_line()
-        #     .encode(x="date", y="FIL")
-        #     .properties(title="Reward/TiB")
-        #     .configure_title(fontSize=14, anchor='middle')
-        # )
-        # st.altair_chart(reward_per_tib.interactive(), use_container_width=True)
-        rewards_table = (
-            alt.Chart(yearly_returns_df)
-            .mark_bar()
-            .encode(
-                # x=alt.X('Yr', axis=alt.Axis(title='Year')),
-                # y=alt.Y('Cumulative FIL Rewards', axis=alt.Axis(title='FIL')),
-                # tooltip=[
-                #     alt.Tooltip("Yr", title="Year"),
-                #     alt.Tooltip("Cumulative FIL Rewards", title="Cumulative FIL Rewards"),
-                # ],
-                x='Yr',
-                y='FIL',
-            )
-            .properties(title="Cumulative Rewards/PiB")
+        # TODO: make this into rewards/TIB
+        reward_per_pib_df = pd.melt(rewards_per_pib_dff, id_vars=["date"],
+                                    value_vars=["cum_rewards_per_pib"], var_name='na', value_name='FIL')
+        reward_per_tib = (
+            alt.Chart(reward_per_pib_df)
+            .mark_line()
+            .encode(x="date", y="FIL")
+            .properties(title="Cumulative Reward/PiB")
             .configure_title(fontSize=14, anchor='middle')
         )
-        st.altair_chart(rewards_table.interactive(), use_container_width=True)
+        st.altair_chart(reward_per_tib.interactive(), use_container_width=True)
+        # rewards_table = (
+        #     alt.Chart(yearly_returns_df)
+        #     .mark_bar()
+        #     .encode(
+        #         # x=alt.X('Yr', axis=alt.Axis(title='Year')),
+        #         # y=alt.Y('Cumulative FIL Rewards', axis=alt.Axis(title='FIL')),
+        #         # tooltip=[
+        #         #     alt.Tooltip("Yr", title="Year"),
+        #         #     alt.Tooltip("Cumulative FIL Rewards", title="Cumulative FIL Rewards"),
+        #         # ],
+        #         x='Yr',
+        #         y='FIL',
+        #     )
+        #     .properties(title="Cumulative Rewards/PiB")
+        #     .configure_title(fontSize=14, anchor='middle')
+        # )
+        # st.altair_chart(rewards_table.interactive(), use_container_width=True)
 
 def forecast_economy(start_date=None, current_date=None, end_date=None, forecast_length_days=365*6):
     t1 = time.time()
@@ -190,6 +194,7 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
     days_1y = 365
     rpp = jnp.convolve(simulation_results['day_rewards_per_PIB'], jnp.ones(days_1y), mode='full')
     rpp = rpp[days_1y-1:1-days_1y]  # remove convolution boundaries
+    simulation_results['cum_rewards_per_pib'] = rpp
     yearly_returns_df = pd.DataFrame({
         'Yr': [str(current_date+timedelta(days=365*1)), 
                str(current_date+timedelta(days=365*2)), 
@@ -197,10 +202,10 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
                str(current_date+timedelta(days=365*4)),
                str(current_date+timedelta(days=365*5)),],
         'FIL': [rpp[days_1y], 
-                rpp[days_1y*2]-rpp[days_1y], 
-                rpp[days_1y*3]-rpp[days_1y*2], 
-                rpp[days_1y*4]-rpp[days_1y*3], 
-                rpp[days_1y*5]-rpp[days_1y*4]
+                rpp[days_1y*2], 
+                rpp[days_1y*3], 
+                rpp[days_1y*4], 
+                rpp[days_1y*5]
                 ]
     })
 
