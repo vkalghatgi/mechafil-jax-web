@@ -193,19 +193,20 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
     # compute yearly cumulative returns
     rpp = simulation_results['1y_return_per_sector'] * pib_per_sector
     simulation_results['1y_return_per_pib'] = rpp
-    yearly_returns_df = pd.DataFrame({
-        'Yr': [str(current_date+timedelta(days=365*1)), 
-               str(current_date+timedelta(days=365*2)), 
-               str(current_date+timedelta(days=365*3)),
-               str(current_date+timedelta(days=365*4)),
-               str(current_date+timedelta(days=365*5)),],
-        'FIL': [rpp[days_1y], 
-                rpp[days_1y*2], 
-                rpp[days_1y*3], 
-                rpp[days_1y*4], 
-                rpp[days_1y*5]
-                ]
-    })
+    # yearly_returns_df = pd.DataFrame({
+    #     'Yr': [str(current_date+timedelta(days=365*1)), 
+    #            str(current_date+timedelta(days=365*2)), 
+    #            str(current_date+timedelta(days=365*3)),
+    #            str(current_date+timedelta(days=365*4)),
+    #            str(current_date+timedelta(days=365*5)),],
+    #     'FIL': [rpp[days_1y], 
+    #             rpp[days_1y*2], 
+    #             rpp[days_1y*3], 
+    #             rpp[days_1y*4], 
+    #             rpp[days_1y*5]
+    #             ]
+    # })
+    yearly_returns_df = pd.DataFrame()
 
     # plot
     plot_panel(simulation_results, baseline, yearly_returns_df, start_date, current_date, end_date)
