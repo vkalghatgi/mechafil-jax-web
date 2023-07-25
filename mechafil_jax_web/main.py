@@ -79,10 +79,7 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
         roi = (
             alt.Chart(roi_df)
             .mark_line()
-            .encode(
-                x="date", 
-                y="FoFR",
-            )
+            .encode(x="date", y="FoFR")
             .properties(title="1Y Sector FoFR")
             .configure_title(fontSize=14, anchor='middle')
         )
@@ -90,13 +87,13 @@ def plot_panel(results, baseline, start_date, current_date, end_date):
             alt.Chart(roi_df)
             .mark_rule()
             .encode(
-                x="date",
+                x="yearmonthdate(date)",
                 y="FoFR",
                 opacity=alt.condition(hover, alt.value(0.3), alt.value(0)),
                 tooltip=[
                     alt.Tooltip("date", title="Date"),
-                    alt.Tooltip("price", title="Price (USD)"),
-                ]
+                    alt.Tooltip("FoFR", title="FoFR"),
+                ],
             )
             .add_selection(hover)
         )
