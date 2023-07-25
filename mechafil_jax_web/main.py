@@ -146,7 +146,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
             alt.Chart(minting_df)
             .mark_line()
             .encode(x=alt.X("date", axis=alt.Axis(labelAngle=-45)), 
-                    y=alt.Y("FILRate", text="FIL/day"))
+                    y=alt.Y("FILRate", title="FIL/day"))
             .properties(title="Minting Rate")
             .configure_title(fontSize=14, anchor='middle')
         )
