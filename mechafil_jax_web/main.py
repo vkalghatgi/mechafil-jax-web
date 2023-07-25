@@ -94,7 +94,8 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         roi = (
             alt.Chart(roi_df)
             .mark_line()
-            .encode(x=alt.X("yearmonthdate(date)"), y="%", 
+            .encode(x=alt.X("yearmonthdate(date)", axis=alt.Axis(tickCount=5, labelAngle=-45)), 
+                    y="%", 
                     # opacity=alt.condition(hover, alt.value(0.3), alt.value(0)), 
                     # tooltip=[
                     #     alt.Tooltip("date", title="Date"),
