@@ -64,12 +64,12 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
     returns_per_pib_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=returns_per_pib_dff.shape[0]))
 
     pledge_dff = pd.DataFrame()
-    pledge_dff['day_pledge_per_QAP'] = results['day_pledge_per_QAP'][1:]
-    pledge_dff['date'] = pd.to_datetime(du.get_t(start_date+timedelta(days=1), forecast_length=pledge_dff.shape[0]))
+    pledge_dff['day_pledge_per_QAP'] = results['day_pledge_per_QAP']
+    pledge_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=pledge_dff.shape[0]))
 
     roi_dff = pd.DataFrame()
-    roi_dff['1y_sector_fofr'] = results['1y_sector_roi'][1:] * 100
-    roi_dff['date'] = pd.to_datetime(du.get_t(start_date+timedelta(days=1), forecast_length=roi_dff.shape[0]))
+    roi_dff['1y_sector_fofr'] = results['1y_sector_roi'] * 100
+    roi_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=roi_dff.shape[0]))
 
     hover = alt.selection_single(
         fields=["date"],
@@ -140,6 +140,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         st.altair_chart(reward_per_pib.interactive(), use_container_width=True)
 
     with col3:
+        # TODO: add day simple mint into this chart
         minting_df = pd.melt(minting_dff, id_vars=["date"],
                              value_vars=["minting_rate"], var_name='na', value_name='FILRate')
         minting = (
