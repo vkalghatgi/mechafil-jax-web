@@ -175,7 +175,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         # st.altair_chart(yr_returns.interactive(), use_container_width=True)
 
         roi_with_costs_dff = add_costs(yearly_returns_df)
-        d.debug(roi_with_costs_dff)
+        # d.debug(roi_with_costs_dff)
         roi_with_costs_df = pd.melt(roi_with_costs_dff, id_vars=["date"], 
                                     value_vars=["filp_roi_with_costs", "cc_roi_with_costs"], var_name='roi_with_costs', value_name='FIL')
         
@@ -254,6 +254,7 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
     )
     # compute yearly cumulative returns
     pledge = simulation_results['day_pledge_per_QAP']
+    d.debug(pledge)
     rpp = simulation_results['1y_return_per_sector'] * pib_per_sector
     simulation_results['1y_return_per_pib'] = rpp
     days_1y = 365
