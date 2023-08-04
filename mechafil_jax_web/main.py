@@ -141,7 +141,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         yr_returns = (
             alt.Chart(yearly_returns_df)
             .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y='1y_return_per_sector', text='FIL')
+                    y='1y_return_per_sector')
             .mark_bar()
             # .mark_text(align='center', dy=-5)
             .properties(title="1Y Returns/PiB")
@@ -173,7 +173,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         #     .configure_title(fontSize=14, anchor='middle')
         # )
         # st.altair_chart(yr_returns.interactive(), use_container_width=True)
-        
+
         # filp_roi_with_costs, cc_roi_with_costs = add_costs(yearly_returns_df)
         # roi_with_costs_dff = pd.DataFrame({
         #     'date': yearly_returns_df['date'],
