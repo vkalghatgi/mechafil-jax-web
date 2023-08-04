@@ -294,11 +294,11 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
     # d.debug(f"Total Time: {t4-t1}")
 
 def main():
-    st.set_page_config(
-        page_title="Filecoin Economics Explorer",
-        page_icon="🚀",
-        layout="wide",
-    )
+    # st.set_page_config(
+    #     page_title="Filecoin Economics Explorer",
+    #     page_icon="🚀",
+    #     layout="wide",
+    # )
     current_date = date.today() - timedelta(days=3)
     start_date = date(current_date.year, current_date.month, 1)
     forecast_length_days=365*6
