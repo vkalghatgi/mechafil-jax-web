@@ -27,7 +27,7 @@ import scenario_generator.utils as u
 def local_css(file_name):
     with open(file_name) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-# local_css("debug.css")
+local_css("debug.css")
 
 @st.cache_data
 def get_offline_data(start_date, current_date, end_date):
@@ -127,17 +127,27 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         )
         st.altair_chart(day_pledge_per_QAP.interactive(), use_container_width=True)
 
-        returns_per_pib_df = pd.melt(returns_per_pib_dff, id_vars=["date"],
-                                    value_vars=["1y_return_per_pib"], var_name='na', value_name='FIL')
-        reward_per_pib = (
-            alt.Chart(returns_per_pib_df)
-            .mark_line()
+        # returns_per_pib_df = pd.melt(returns_per_pib_dff, id_vars=["date"],
+        #                             value_vars=["1y_return_per_pib"], var_name='na', value_name='FIL')
+        # reward_per_pib = (
+        #     alt.Chart(returns_per_pib_df)
+        #     .mark_line()
+        #     .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
+        #             y="FIL")
+        #     .properties(title="1Y Returns/PiB")
+        #     .configure_title(fontSize=14, anchor='middle')
+        # )
+        # st.altair_chart(reward_per_pib.interactive(), use_container_width=True)
+        yr_returns = (
+            alt.Chart(yearly_returns_df)
             .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y="FIL")
+                    y='FIL', text='FIL')
+            .mark_bar()
+            # .mark_text(align='center', dy=-5)
             .properties(title="1Y Returns/PiB")
             .configure_title(fontSize=14, anchor='middle')
         )
-        st.altair_chart(reward_per_pib.interactive(), use_container_width=True)
+        st.altair_chart(yr_returns.interactive(), use_container_width=True)
 
     with col3:
         # TODO: add day simple mint into this chart
@@ -153,16 +163,59 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         )
         st.altair_chart(minting.interactive(), use_container_width=True)
 
-        yr_returns = (
-            alt.Chart(yearly_returns_df)
+        # yr_returns = (
+        #     alt.Chart(yearly_returns_df)
+        #     .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
+        #             y='FIL', text='FIL')
+        #     .mark_bar()
+        #     # .mark_text(align='center', dy=-5)
+        #     .properties(title="1Y Returns/PiB")
+        #     .configure_title(fontSize=14, anchor='middle')
+        # )
+        # st.altair_chart(yr_returns.interactive(), use_container_width=True)
+        filp_roi_with_costs, cc_roi_with_costs = add_costs(yearly_returns_df)
+        roi_with_costs_dff = pd.DataFrame({
+            'date': yearly_returns_df['date'],
+            'filp_costs': filp_roi_with_costs,
+            'cc_costs': cc_roi_with_costs,
+        })
+        roi_with_costs_df = pd.melt(roi_with_costs_dff, id_vars=["date"], 
+                                    value_vars=["filp_costs", "cc_costs"], var_name='roi_with_costs', value_name='FIL')
+        
+        roi_with_costs = (
+            alt.Chart(roi_with_costs_df)
             .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y='FIL', text='FIL')
+                    y='FIL', text='FIL', color=alt.Color('roi_with_costs', legend=alt.Legend(orient="top", title=None)))
             .mark_bar()
             # .mark_text(align='center', dy=-5)
-            .properties(title="1Y Returns/PiB")
+            .properties(title="1Y Returns/PiB (after costs)")
             .configure_title(fontSize=14, anchor='middle')
         )
-        st.altair_chart(yr_returns.interactive(), use_container_width=True)
+        st.altair_chart(roi_with_costs.interactive(), use_container_width=True)
+
+
+def compute_scenarios():
+    pass
+
+def add_costs(discretized_returns_df):
+    # (returns*multiplier - cost)/(pledge*multiplier)
+    # TODO: allow user to configure these within reasonable bounds
+    cost_scaling_constant = 0.1
+    filp_scaling_cost_pct = 0.5
+
+    # compute costs for the FIL+ case
+    multiplier = 10
+    filp_roi_scaling_costs = discretized_returns_df['day_pledge_per_QAP']*multiplier*cost_scaling_constant
+    filp_roi_total_costs = filp_roi_scaling_costs/filp_scaling_cost_pct
+    roi_fixed_costs = filp_roi_total_costs - filp_roi_scaling_costs
+    filp_roi_with_costs = (discretized_returns_df['1y_return_per_sector']*multiplier - filp_roi_total_costs)/(discretized_returns_df['day_pledge_per_QAP']*multiplier)
+
+    # relative to FIL+, compute costs for the CC case
+    multiplier = 1
+    cc_roi_scaling_costs = discretized_returns_df['day_pledge_per_QAP']*multiplier*cost_scaling_constant
+    cc_roi_total_costs = cc_roi_scaling_costs + roi_fixed_costs
+    cc_roi_with_costs = (discretized_returns_df['1y_return_per_sector']*multiplier - cc_roi_total_costs)/(discretized_returns_df['day_pledge_per_QAP']*multiplier)
+    return filp_roi_with_costs, cc_roi_with_costs
 
 def forecast_economy(start_date=None, current_date=None, end_date=None, forecast_length_days=365*6):
     t1 = time.time()
@@ -203,6 +256,7 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
         np.datetime64(start_date), np.datetime64(end_date), offline_data['init_baseline_eib'],
     )
     # compute yearly cumulative returns
+    pledge = simulation_results['day_pledge_per_QAP']
     rpp = simulation_results['1y_return_per_sector'] * pib_per_sector
     simulation_results['1y_return_per_pib'] = rpp
     days_1y = 365
@@ -222,6 +276,14 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
             float(rpp[days_1y*3]), 
             float(rpp[days_1y*4]), 
             float(rpp[days_1y*5]), 
+        ],
+        'pledge': [
+            float(pledge[0]), 
+            float(pledge[days_1y]), 
+            float(pledge[days_1y*2]),  
+            float(pledge[days_1y*3]), 
+            float(pledge[days_1y*4]), 
+            float(pledge[days_1y*5]), 
         ]
     })
 
