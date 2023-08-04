@@ -141,7 +141,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         yr_returns = (
             alt.Chart(yearly_returns_df)
             .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y='FIL', text='FIL')
+                    y='1y_return_per_sector', text='FIL')
             .mark_bar()
             # .mark_text(align='center', dy=-5)
             .properties(title="1Y Returns/PiB")
@@ -269,7 +269,7 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
             str(current_date+timedelta(days=365*4)),
             str(current_date+timedelta(days=365*5)),
         ],
-        'FIL': [
+        '1y_return_per_sector': [
             float(rpp[0]), 
             float(rpp[days_1y]), 
             float(rpp[days_1y*2]),  
