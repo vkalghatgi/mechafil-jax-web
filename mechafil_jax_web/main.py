@@ -173,25 +173,26 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         #     .configure_title(fontSize=14, anchor='middle')
         # )
         # st.altair_chart(yr_returns.interactive(), use_container_width=True)
-        filp_roi_with_costs, cc_roi_with_costs = add_costs(yearly_returns_df)
-        roi_with_costs_dff = pd.DataFrame({
-            'date': yearly_returns_df['date'],
-            'filp_costs': filp_roi_with_costs,
-            'cc_costs': cc_roi_with_costs,
-        })
-        roi_with_costs_df = pd.melt(roi_with_costs_dff, id_vars=["date"], 
-                                    value_vars=["filp_costs", "cc_costs"], var_name='roi_with_costs', value_name='FIL')
         
-        roi_with_costs = (
-            alt.Chart(roi_with_costs_df)
-            .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y='FIL', text='FIL', color=alt.Color('roi_with_costs', legend=alt.Legend(orient="top", title=None)))
-            .mark_bar()
-            # .mark_text(align='center', dy=-5)
-            .properties(title="1Y Returns/PiB (after costs)")
-            .configure_title(fontSize=14, anchor='middle')
-        )
-        st.altair_chart(roi_with_costs.interactive(), use_container_width=True)
+        # filp_roi_with_costs, cc_roi_with_costs = add_costs(yearly_returns_df)
+        # roi_with_costs_dff = pd.DataFrame({
+        #     'date': yearly_returns_df['date'],
+        #     'filp_costs': filp_roi_with_costs,
+        #     'cc_costs': cc_roi_with_costs,
+        # })
+        # roi_with_costs_df = pd.melt(roi_with_costs_dff, id_vars=["date"], 
+        #                             value_vars=["filp_costs", "cc_costs"], var_name='roi_with_costs', value_name='FIL')
+        
+        # roi_with_costs = (
+        #     alt.Chart(roi_with_costs_df)
+        #     .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
+        #             y='roi_with_costs', text='FIL', color=alt.Color('roi_with_costs', legend=alt.Legend(orient="top", title=None)))
+        #     .mark_bar()
+        #     # .mark_text(align='center', dy=-5)
+        #     .properties(title="1Y Returns/PiB (after costs)")
+        #     .configure_title(fontSize=14, anchor='middle')
+        # )
+        # st.altair_chart(roi_with_costs.interactive(), use_container_width=True)
 
 
 def compute_scenarios():
