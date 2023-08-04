@@ -175,7 +175,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         # st.altair_chart(yr_returns.interactive(), use_container_width=True)
 
         roi_with_costs_dff = add_costs(yearly_returns_df)
-        print(roi_with_costs_dff)
+        d.debug(roi_with_costs_dff)
         roi_with_costs_df = pd.melt(roi_with_costs_dff, id_vars=["date"], 
                                     value_vars=["filp_roi_with_costs", "cc_roi_with_costs"], var_name='roi_with_costs', value_name='FIL')
         
