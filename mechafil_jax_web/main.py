@@ -254,7 +254,8 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
     )
     # compute yearly cumulative returns
     pledge = simulation_results['day_pledge_per_QAP']
-    d.debug(pledge)
+    # nan's in pledge, TODO: debug
+    d.debug(np.where(pledge == np.nan))
     rpp = simulation_results['1y_return_per_sector'] * pib_per_sector
     simulation_results['1y_return_per_pib'] = rpp
     days_1y = 365
@@ -298,7 +299,8 @@ def main():
     #     layout="wide",
     # )
     current_date = date.today() - timedelta(days=3)
-    start_date = date(current_date.year, current_date.month, 1)
+    mo_start = min(current_date.month - 1 % 12, 1)
+    start_date = date(current_date.year, mo_start, 1)
     forecast_length_days=365*6
     end_date = current_date + timedelta(days=forecast_length_days)
     forecast_kwargs = {
