@@ -145,7 +145,7 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
                 x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
                 y=alt.Y("%"), 
                 color=alt.Color('Miner', legend=alt.Legend(orient="top", title=None)))
-            .properties(title="FoFR w/ Costs")
+            .properties(title="1Y Sector FoFR w/ Costs")
             .configure_title(fontSize=14, anchor='middle')
         )
         st.altair_chart(roi_with_costs.interactive(), use_container_width=True) 
@@ -179,11 +179,11 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
 def compute_scenarios():
     pass
 
-def add_costs(results_dict):
+def add_costs(results_dict, cost_scaling_constant=0.1, filp_scaling_cost_pct=0.5):
     # (returns*multiplier - cost)/(pledge*multiplier)
     # TODO: allow user to configure these within reasonable bounds
-    cost_scaling_constant = 0.1
-    filp_scaling_cost_pct = 0.5
+    # cost_scaling_constant = 0.1
+    # filp_scaling_cost_pct = 0.5
 
     # compute costs for the FIL+ case
     multiplier = 10
@@ -208,6 +208,8 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
     rb_onboard_power_pib_day =  st.session_state['rbp_slider']
     renewal_rate_pct = st.session_state['rr_slider']
     fil_plus_rate_pct = st.session_state['fpr_slider']
+    cost_scaling_constant = st.session_state['cost_scaling_constant']
+    filp_scaling_cost_pct = st.session_state['filp_scaling_cost_pct']
 
     sector_duration_days = 360
     
@@ -235,7 +237,7 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
         sector_duration_days,
         offline_data
     )
-    simulation_results = add_costs(simulation_results)
+    simulation_results = add_costs(simulation_results, cost_scaling_constant, filp_scaling_cost_pct)
     pib_per_sector = C.PIB / C.SECTOR_SIZE
     simulation_results['day_rewards_per_PIB'] = simulation_results['day_rewards_per_sector'] * pib_per_sector
     baseline = minting.compute_baseline_power_array(
@@ -307,6 +309,12 @@ def main():
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
         st.slider("FIL+ Rate (Percentage)", min_value=10, max_value=99, value=smoothed_last_historical_fil_plus_pct, step=1, format='%d', key="fpr_slider",
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
+        
+        st.slider("Cost Factor", min_value=0, max_value=1, value=0.1, step=0.01, format='%d', key="cost_scaling_constant",
+                on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
+        st.slider("Scaling Cost Fraction", min_value=0, max_value=1, value=0.5, step=0.01, format='%d', key="filp_scaling_cost_pct",
+                on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
+
         st.button("Forecast", on_click=forecast_economy, kwargs=forecast_kwargs, key="forecast_button")
 
     
