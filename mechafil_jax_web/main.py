@@ -333,7 +333,6 @@ def main():
     # d.debug(smoothed_last_historical_rbp)
     # d.debug(smoothed_last_historical_renewal_pct)
     # d.debug(smoothed_last_historical_fil_plus_pct)
-    compute_scenarios()
 
     with st.sidebar:
         st.title('Filecoin Economics Explorer')
