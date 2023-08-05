@@ -122,7 +122,7 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
         # NOTE: adding the tooltip here causes the chart to not render for some reason
         # Following the directions here: https://docs.streamlit.io/library/api-reference/charts/st.altair_chart
         roi_df = pd.melt(roi_dff, id_vars=["date"], 
-                         value_vars=["1y_sector_fofrs-sq", "1y_sector_fofr-p", "1y_sector_fofr-o"], 
+                         value_vars=["1y_sector_fofr-sq", "1y_sector_fofr-p", "1y_sector_fofr-o"], 
                          var_name='fofr', 
                          value_name='%')
         roi = (
