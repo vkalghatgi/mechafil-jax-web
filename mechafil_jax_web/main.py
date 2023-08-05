@@ -45,42 +45,69 @@ def get_offline_data(start_date, current_date, end_date):
     return offline_data, smoothed_last_historical_rbp, smoothed_last_historical_rr, smoothed_last_historical_fpr
 
 
-def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, end_date):
+def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
     # convert results dictionary into a dataframe so that we can use altair to make nice plots
+    status_quo_results = scenario_results['status-quo'][0]
+    status_quo_yearly_returns = scenario_results['status-quo'][1]
+    pessimistic_results = scenario_results['pessimistic'][0]
+    pessimistic_yearly_returns = scenario_results['pessimistic'][1]
+    optimistic_results = scenario_results['optimistic'][0]
+    optimistic_yearly_returns = scenario_results['optimistic'][1]
+
     col1, col2, col3 = st.columns(3)
 
     power_dff = pd.DataFrame()
-    power_dff['RBP'] = results['rb_total_power_eib']
-    power_dff['QAP'] = results['qa_total_power_eib']
+    power_dff['RBP-StatusQuo'] = status_quo_results['rb_total_power_eib']
+    power_dff['QAP-StatusQuo'] = status_quo_results['qa_total_power_eib']
+    power_dff['RBP-Pessimistic'] = pessimistic_results['rb_total_power_eib']
+    power_dff['QAP-Pessimistic'] = pessimistic_results['qa_total_power_eib']
+    power_dff['RBP-Optimistic'] = optimistic_results['rb_total_power_eib']
+    power_dff['QAP-Optimistic'] = optimistic_results['qa_total_power_eib']
     power_dff['Baseline'] = baseline
     power_dff['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
 
     minting_dff = pd.DataFrame()
-    minting_dff['minting_rate'] = results['day_network_reward']
+    minting_dff['minting_rate-sq'] = status_quo_results['day_network_reward']
+    minting_dff['minting_rate-p'] = pessimistic_results['day_network_reward']
+    minting_dff['minting_rate-o'] = optimistic_results['day_network_reward']
     minting_dff['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
 
     returns_per_pib_dff = pd.DataFrame()
-    returns_per_pib_dff['1y_return_per_pib'] = results['1y_return_per_pib']
+    returns_per_pib_dff['1y_return_per_pib-sq'] = status_quo_results['1y_return_per_pib']
+    returns_per_pib_dff['1y_return_per_pib-p'] = pessimistic_results['1y_return_per_pib']
+    returns_per_pib_dff['1y_return_per_pib-o'] = optimistic_results['1y_return_per_pib']
     returns_per_pib_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=returns_per_pib_dff.shape[0]))
 
     pledge_dff = pd.DataFrame()
-    pledge_dff['day_pledge_per_QAP'] = results['day_pledge_per_QAP']
+    pledge_dff['day_pledge_per_QAP-sq'] = status_quo_results['day_pledge_per_QAP']
+    pledge_dff['day_pledge_per_QAP-p'] = pessimistic_results['day_pledge_per_QAP']
+    pledge_dff['day_pledge_per_QAP-o'] = optimistic_results['day_pledge_per_QAP']
     pledge_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=pledge_dff.shape[0]))
 
     roi_dff = pd.DataFrame()
-    roi_dff['1y_sector_fofr'] = results['1y_sector_roi'] * 100
+    roi_dff['1y_sector_fofr-sq'] = status_quo_results['1y_sector_roi'] * 100
+    roi_dff['1y_sector_fofr-p'] = pessimistic_results['1y_sector_roi'] * 100
+    roi_dff['1y_sector_fofr-o'] = optimistic_results['1y_sector_roi'] * 100
     roi_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=roi_dff.shape[0]))
 
-    hover = alt.selection_single(
-        fields=["date"],
-        nearest=True,
-        on="mouseover",
-        empty="none",
-    )
+    roi_with_costs_dff = pd.DataFrame()
+    roi_with_costs_dff['FIL+-sq'] = status_quo_results['FIL+']
+    roi_with_costs_dff['CC-sq'] = status_quo_results['CC']
+    roi_with_costs_dff['FIL+-o'] = optimistic_results['FIL+']
+    roi_with_costs_dff['CC-o'] = optimistic_results['CC']
+    roi_with_costs_dff['FIL+-p'] = pessimistic_results['FIL+']
+    roi_with_costs_dff['CC-p'] = pessimistic_results['CC']
+    roi_with_costs_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=roi_with_costs_dff.shape[0]))
     
     with col1:
         power_df = pd.melt(power_dff, id_vars=["date"], 
-                           value_vars=["Baseline", "RBP", "QAP"], var_name='Power', value_name='EIB')
+                           value_vars=[
+                               "Baseline", 
+                               "RBP-StatusQuo", "QAP-StatusQuo",
+                               "RBP-Pessimistic", "QAP-Pessimistic",
+                               "RBP-Optimistic", "QAP-Optimistic"], 
+                           var_name='Power', 
+                           value_name='EIB')
         power_df['EIB'] = power_df['EIB']
         power = (
             alt.Chart(power_df)
@@ -95,18 +122,14 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         # NOTE: adding the tooltip here causes the chart to not render for some reason
         # Following the directions here: https://docs.streamlit.io/library/api-reference/charts/st.altair_chart
         roi_df = pd.melt(roi_dff, id_vars=["date"], 
-                         value_vars=["1y_sector_fofr"], var_name='na', value_name='%')
+                         value_vars=["1y_sector_fofrs-sq", "1y_sector_fofr-p", "1y_sector_fofr-o"], 
+                         var_name='fofr', 
+                         value_name='%')
         roi = (
             alt.Chart(roi_df)
             .mark_line()
             .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y="%", 
-                    # opacity=alt.condition(hover, alt.value(0.3), alt.value(0)), 
-                    # tooltip=[
-                    #     alt.Tooltip("date", title="Date"),
-                    #     alt.Tooltip("FoFR", title="FoFR"),
-                    # ],
-            )
+                    y=alt.Y("%"), color=alt.Color('fofr', legend=alt.Legend(orient="top", title=None)))
             .properties(title="1Y Sector FoFR")
             .configure_title(fontSize=14, anchor='middle')
             # .add_params(hover)
@@ -116,25 +139,22 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
     with col2:
         # pledge_per_qap_df = my_melt(cil_df_historical, cil_df_forecast, 'day_pledge_per_QAP')
         pledge_per_qap_df = pd.melt(pledge_dff, id_vars=["date"],
-                                    value_vars=["day_pledge_per_QAP"], var_name='na', value_name='FIL')
+                                    value_vars=["day_pledge_per_QAP-sq", "day_pledge_per_QAP-p", "day_pledge_per_QAP-o"], 
+                                    var_name='dppq', value_name='FIL')
         day_pledge_per_QAP = (
             alt.Chart(pledge_per_qap_df)
             .mark_line()
             .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y="FIL")
+                    y=alt.Y("FIL"), color=alt.Color('dppq', legend=alt.Legend(orient="top", title=None)))
             .properties(title="Pledge/32GiB QAP")
             .configure_title(fontSize=14, anchor='middle')
         )
         st.altair_chart(day_pledge_per_QAP.interactive(), use_container_width=True)
 
-        roi_with_costs_dff = pd.DataFrame()
-        roi_with_costs_dff['FIL+'] = results['FIL+']
-        roi_with_costs_dff['CC'] = results['CC']
-        roi_with_costs_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=len(results['FIL+'])))
         roi_with_costs_df = pd.melt(
             roi_with_costs_dff, 
             id_vars=["date"], 
-            value_vars=["FIL+", "CC"], 
+            value_vars=["FIL+-sq", "CC-sq", "FIL+-p", "CC-p", "FIL+-o", "CC-o"], 
             var_name='Miner', 
             value_name='%'
         )
@@ -153,31 +173,29 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
     with col3:
         # TODO: add day simple mint into this chart
         minting_df = pd.melt(minting_dff, id_vars=["date"],
-                             value_vars=["minting_rate"], var_name='na', value_name='FILRate')
+                             value_vars=["minting_rate-sq", "minting_rate-p", "minting_rate-o"], 
+                             var_name='na', value_name='FILRate')
         minting = (
             alt.Chart(minting_df)
             .mark_line()
             .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y=alt.Y("FILRate", title="FIL/day"))
+                    y=alt.Y("FIL", title='FIL/day'), color=alt.Color('na', legend=alt.Legend(orient="top", title=None)))
             .properties(title="Minting Rate")
             .configure_title(fontSize=14, anchor='middle')
         )
         st.altair_chart(minting.interactive(), use_container_width=True)
 
-        yr_returns = (
-            alt.Chart(yearly_returns_df)
-            .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y=alt.Y('1y_return_per_pib', title='FIL'))
-            .mark_bar()
-            # .mark_text(align='center', dy=-5)
-            .properties(title="1Y Returns/PiB")
-            .configure_title(fontSize=14, anchor='middle')
-        )
-        st.altair_chart(yr_returns.interactive(), use_container_width=True)
-
-
-def compute_scenarios():
-    pass
+        # TODO: need a stacked bar chart here
+        # yr_returns = (
+        #     alt.Chart(yearly_returns_df)
+        #     .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
+        #             y=alt.Y('1y_return_per_pib', title='FIL'))
+        #     .mark_bar()
+        #     # .mark_text(align='center', dy=-5)
+        #     .properties(title="1Y Returns/PiB")
+        #     .configure_title(fontSize=14, anchor='middle')
+        # )
+        # st.altair_chart(yr_returns.interactive(), use_container_width=True)
 
 def add_costs(results_dict, cost_scaling_constant=0.1, filp_scaling_cost_pct=0.5):
     # (returns*multiplier - cost)/(pledge*multiplier)
@@ -202,29 +220,8 @@ def add_costs(results_dict, cost_scaling_constant=0.1, filp_scaling_cost_pct=0.5
     results_dict['CC'] = 100*(rps*multiplier - cc_roi_total_costs)/(dppq*multiplier)
     return results_dict
 
-def forecast_economy(start_date=None, current_date=None, end_date=None, forecast_length_days=365*6):
-    t1 = time.time()
-    
-    rb_onboard_power_pib_day =  st.session_state['rbp_slider']
-    renewal_rate_pct = st.session_state['rr_slider']
-    fil_plus_rate_pct = st.session_state['fpr_slider']
-    cost_scaling_constant = st.session_state['cost_scaling_constant']
-    filp_scaling_cost_pct = st.session_state['filp_scaling_cost_pct']
-
-    sector_duration_days = 360
-    
-    # get offline data
-    t2 = time.time()
-    offline_data, _, _, _ = get_offline_data(start_date, current_date, end_date)
-    t3 = time.time()
-    # d.debug(f"Time to get historical data: {t3-t2}")
-
-    # run simulation
-    rbp = jnp.ones(forecast_length_days) * rb_onboard_power_pib_day
-    rr = jnp.ones(forecast_length_days) * renewal_rate_pct / 100.
-    fpr = jnp.ones(forecast_length_days) * fil_plus_rate_pct / 100.
-    lock_target = 0.3
-
+def run_sim(rbp, rr, fpr, lock_target, start_date, current_date, forecast_length_days, sector_duration_days, offline_data, 
+            cost_scaling_constant=0.1, filp_scaling_cost_pct=0.5):
     simulation_results = sim.run_sim(
         rbp,
         rr,
@@ -240,9 +237,6 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
     simulation_results = add_costs(simulation_results, cost_scaling_constant, filp_scaling_cost_pct)
     pib_per_sector = C.PIB / C.SECTOR_SIZE
     simulation_results['day_rewards_per_PIB'] = simulation_results['day_rewards_per_sector'] * pib_per_sector
-    baseline = minting.compute_baseline_power_array(
-        np.datetime64(start_date), np.datetime64(end_date), offline_data['init_baseline_eib'],
-    )
     # compute yearly cumulative returns
     pledge = simulation_results['day_pledge_per_QAP']
     rps = simulation_results['1y_return_per_sector']
@@ -267,9 +261,49 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
             float(rpp[days_1y*5]), 
         ],
     })
+    return simulation_results, yearly_returns_df
+
+def forecast_economy(start_date=None, current_date=None, end_date=None, forecast_length_days=365*6):
+    t1 = time.time()
+    
+    rb_onboard_power_pib_day =  st.session_state['rbp_slider']
+    renewal_rate_pct = st.session_state['rr_slider']
+    fil_plus_rate_pct = st.session_state['fpr_slider']
+    cost_scaling_constant = st.session_state['cost_scaling_constant']
+    filp_scaling_cost_pct = st.session_state['filp_scaling_cost_pct']
+
+    lock_target = 0.3
+    sector_duration_days = 360
+    
+    # get offline data
+    t2 = time.time()
+    offline_data, _, _, _ = get_offline_data(start_date, current_date, end_date)
+    t3 = time.time()
+    # d.debug(f"Time to get historical data: {t3-t2}")
+
+    # run simulation for the configured scenario, and for a pessimsitc and optimistic version of it
+    scenario_scalers = [0.5, 1.0, 1.5]
+    scenario_strings = ['pessimistic', 'status-quo', 'optimistic']
+    scenario_results = {}
+    for ii, scenario_scaler in enumerate(scenario_scalers):
+        rbp_val = rb_onboard_power_pib_day * scenario_scaler
+        rr_val = max(0.0, min(1.0, renewal_rate_pct / 100. * scenario_scaler))
+        fpr_val = max(0.0, min(1.0, fil_plus_rate_pct / 100. * scenario_scaler))
+
+        rbp = jnp.ones(forecast_length_days) * rbp_val
+        rr = jnp.ones(forecast_length_days) * rr_val
+        fpr = jnp.ones(forecast_length_days) * fpr_val
+        
+        simulation_results, yearly_returns_df = run_sim(rbp, rr, fpr, lock_target, start_date, current_date, forecast_length_days, sector_duration_days, offline_data, 
+                cost_scaling_constant=cost_scaling_constant, filp_scaling_cost_pct=filp_scaling_cost_pct)
+        scenario_results[scenario_strings[ii]] = (simulation_results, yearly_returns_df)
+
+    baseline = minting.compute_baseline_power_array(
+        np.datetime64(start_date), np.datetime64(end_date), offline_data['init_baseline_eib'],
+    )
 
     # plot
-    plot_panel(simulation_results, baseline, yearly_returns_df, start_date, current_date, end_date)
+    plot_panel(scenario_results, baseline, start_date, current_date, end_date)
     t4 = time.time()
     # d.debug(f"Time to forecast: {t4-t3}")
     # d.debug(f"Total Time: {t4-t1}")
@@ -299,6 +333,7 @@ def main():
     # d.debug(smoothed_last_historical_rbp)
     # d.debug(smoothed_last_historical_renewal_pct)
     # d.debug(smoothed_last_historical_fil_plus_pct)
+    compute_scenarios()
 
     with st.sidebar:
         st.title('Filecoin Economics Explorer')
