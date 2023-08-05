@@ -310,9 +310,9 @@ def main():
         st.slider("FIL+ Rate (Percentage)", min_value=10, max_value=99, value=smoothed_last_historical_fil_plus_pct, step=1, format='%d', key="fpr_slider",
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
         
-        st.slider("Cost Factor", min_value=0, max_value=1, value=0.1, step=0.01, format='%d', key="cost_scaling_constant",
+        st.slider("Cost Factor", min_value=0, max_value=1, value=0.1, step=0.01, format='%0.02f', key="cost_scaling_constant",
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
-        st.slider("Scaling Cost Fraction", min_value=0, max_value=1, value=0.5, step=0.01, format='%d', key="filp_scaling_cost_pct",
+        st.slider("Scaling Cost Fraction", min_value=0, max_value=1, value=0.5, step=0.01, format='%0.02f', key="filp_scaling_cost_pct",
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
 
         st.button("Forecast", on_click=forecast_economy, kwargs=forecast_kwargs, key="forecast_button")
