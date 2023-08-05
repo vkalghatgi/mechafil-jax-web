@@ -67,27 +67,27 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
     power_dff['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
 
     minting_dff = pd.DataFrame()
-    minting_dff['minting_rate-sq'] = status_quo_results['day_network_reward']
-    minting_dff['minting_rate-p'] = pessimistic_results['day_network_reward']
-    minting_dff['minting_rate-o'] = optimistic_results['day_network_reward']
+    minting_dff['StatusQuo'] = status_quo_results['day_network_reward']
+    minting_dff['Pessimistic'] = pessimistic_results['day_network_reward']
+    minting_dff['Optimistic'] = optimistic_results['day_network_reward']
     minting_dff['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
 
     returns_per_pib_dff = pd.DataFrame()
-    returns_per_pib_dff['1y_return_per_pib-sq'] = status_quo_results['1y_return_per_pib']
-    returns_per_pib_dff['1y_return_per_pib-p'] = pessimistic_results['1y_return_per_pib']
-    returns_per_pib_dff['1y_return_per_pib-o'] = optimistic_results['1y_return_per_pib']
+    returns_per_pib_dff['StatusQuo'] = status_quo_results['1y_return_per_pib']
+    returns_per_pib_dff['Pessimistic'] = pessimistic_results['1y_return_per_pib']
+    returns_per_pib_dff['Optimistic'] = optimistic_results['1y_return_per_pib']
     returns_per_pib_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=returns_per_pib_dff.shape[0]))
 
     pledge_dff = pd.DataFrame()
-    pledge_dff['day_pledge_per_QAP-sq'] = status_quo_results['day_pledge_per_QAP']
-    pledge_dff['day_pledge_per_QAP-p'] = pessimistic_results['day_pledge_per_QAP']
-    pledge_dff['day_pledge_per_QAP-o'] = optimistic_results['day_pledge_per_QAP']
+    pledge_dff['StatusQuo'] = status_quo_results['day_pledge_per_QAP']
+    pledge_dff['Pessimistic'] = pessimistic_results['day_pledge_per_QAP']
+    pledge_dff['Optimistic'] = optimistic_results['day_pledge_per_QAP']
     pledge_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=pledge_dff.shape[0]))
 
     roi_dff = pd.DataFrame()
-    roi_dff['1y_sector_fofr-sq'] = status_quo_results['1y_sector_roi'] * 100
-    roi_dff['1y_sector_fofr-p'] = pessimistic_results['1y_sector_roi'] * 100
-    roi_dff['1y_sector_fofr-o'] = optimistic_results['1y_sector_roi'] * 100
+    roi_dff['StatusQuo'] = status_quo_results['1y_sector_roi'] * 100
+    roi_dff['Pessimistic'] = pessimistic_results['1y_sector_roi'] * 100
+    roi_dff['Optimistic'] = optimistic_results['1y_sector_roi'] * 100
     roi_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=roi_dff.shape[0]))
 
     roi_with_costs_dff = pd.DataFrame()
@@ -122,7 +122,7 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
         # NOTE: adding the tooltip here causes the chart to not render for some reason
         # Following the directions here: https://docs.streamlit.io/library/api-reference/charts/st.altair_chart
         roi_df = pd.melt(roi_dff, id_vars=["date"], 
-                         value_vars=["1y_sector_fofr-sq", "1y_sector_fofr-p", "1y_sector_fofr-o"], 
+                         value_vars=["StatusQuo", "Pessimistic", "Optimistic"], 
                          var_name='fofr', 
                          value_name='%')
         roi = (
@@ -139,7 +139,7 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
     with col2:
         # pledge_per_qap_df = my_melt(cil_df_historical, cil_df_forecast, 'day_pledge_per_QAP')
         pledge_per_qap_df = pd.melt(pledge_dff, id_vars=["date"],
-                                    value_vars=["day_pledge_per_QAP-sq", "day_pledge_per_QAP-p", "day_pledge_per_QAP-o"], 
+                                    value_vars=["StatusQuo", "Pessimistic", "Optimistic"], 
                                     var_name='dppq', value_name='FIL')
         day_pledge_per_QAP = (
             alt.Chart(pledge_per_qap_df)
@@ -173,7 +173,7 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
     with col3:
         # TODO: add day simple mint into this chart
         minting_df = pd.melt(minting_dff, id_vars=["date"],
-                             value_vars=["minting_rate-sq", "minting_rate-p", "minting_rate-o"], 
+                             value_vars=["StatusQuo", "Pessimistic", "Optimistic"], 
                              var_name='na', value_name='FILRate')
         minting = (
             alt.Chart(minting_df)
