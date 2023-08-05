@@ -127,16 +127,28 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         )
         st.altair_chart(day_pledge_per_QAP.interactive(), use_container_width=True)
 
-        yr_returns = (
-            alt.Chart(yearly_returns_df)
-            .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y=alt.Y('1y_return_per_pib', title='FIL'))
-            .mark_bar()
-            # .mark_text(align='center', dy=-5)
-            .properties(title="1Y Returns/PiB")
+        roi_with_costs_dff = pd.DataFrame()
+        roi_with_costs_dff['FIL+'] = results['FIL+']
+        roi_with_costs_dff['CC'] = results['CC']
+        roi_with_costs_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=len(results['FIL+'])))
+        roi_with_costs_df = pd.melt(
+            roi_with_costs_dff, 
+            id_vars=["date"], 
+            value_vars=["FIL+", "CC"], 
+            var_name='Miner', 
+            value_name='%'
+        )
+        roi_with_costs = (
+            alt.Chart(roi_with_costs_df)
+            .mark_line()
+            .encode(
+                x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
+                y=alt.Y("%"), 
+                color=alt.Color('Miner', legend=alt.Legend(orient="top", title=None)))
+            .properties(title="FoFR w/ Costs")
             .configure_title(fontSize=14, anchor='middle')
         )
-        st.altair_chart(yr_returns.interactive(), use_container_width=True)
+        st.altair_chart(roi_with_costs.interactive(), use_container_width=True) 
 
     with col3:
         # TODO: add day simple mint into this chart
@@ -152,36 +164,22 @@ def plot_panel(results, baseline, yearly_returns_df, start_date, current_date, e
         )
         st.altair_chart(minting.interactive(), use_container_width=True)
 
-        roi_with_costs_dff = add_costs(yearly_returns_df)
-        roi_with_costs_df = pd.melt(roi_with_costs_dff, 
-            id_vars=["date"], 
-            value_vars=["FIL+", "CC"], 
-            var_name='Miner', 
-            value_name='%'
+        yr_returns = (
+            alt.Chart(yearly_returns_df)
+            .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
+                    y=alt.Y('1y_return_per_pib', title='FIL'))
+            .mark_bar()
+            # .mark_text(align='center', dy=-5)
+            .properties(title="1Y Returns/PiB")
+            .configure_title(fontSize=14, anchor='middle')
         )
-        roi_with_costs = (
-            alt.Chart(roi_with_costs_df).encode(
-                x=alt.X("Miner", 
-                        axis=alt.Axis(title=None, labels=False, ticks=False)),
-                y='%', 
-                text='%', 
-                color='Miner', 
-                column=alt.Column(
-                    'date', 
-                    header=alt.Header(
-                        title=None, 
-                        labelOrient='bottom')
-                )).mark_bar()
-                .properties(title="1Y FoFR w/. Costs")
-                .configure_title(fontSize=14, anchor='middle').configure_view(stroke='transparent')
-        )
-        st.altair_chart(roi_with_costs.interactive(), use_container_width=True)
+        st.altair_chart(yr_returns.interactive(), use_container_width=True)
 
 
 def compute_scenarios():
     pass
 
-def add_costs(discretized_returns_df):
+def add_costs(results_dict):
     # (returns*multiplier - cost)/(pledge*multiplier)
     # TODO: allow user to configure these within reasonable bounds
     cost_scaling_constant = 0.1
@@ -189,17 +187,20 @@ def add_costs(discretized_returns_df):
 
     # compute costs for the FIL+ case
     multiplier = 10
-    filp_roi_scaling_costs = discretized_returns_df['day_pledge_per_QAP']*multiplier*cost_scaling_constant
+    rps = results_dict['1y_return_per_sector']
+    dppq = results_dict['day_pledge_per_QAP'][0:len(rps)]
+    
+    filp_roi_scaling_costs = dppq*multiplier*cost_scaling_constant
     filp_roi_total_costs = filp_roi_scaling_costs/filp_scaling_cost_pct
     roi_fixed_costs = filp_roi_total_costs - filp_roi_scaling_costs
-    discretized_returns_df['FIL+'] = 100*(discretized_returns_df['1y_return_per_sector']*multiplier - filp_roi_total_costs)/(discretized_returns_df['day_pledge_per_QAP']*multiplier)
+    results_dict['FIL+'] = 100*(rps*multiplier - filp_roi_total_costs)/(dppq*multiplier)
 
     # relative to FIL+, compute costs for the CC case
     multiplier = 1
-    cc_roi_scaling_costs = discretized_returns_df['day_pledge_per_QAP']*multiplier*cost_scaling_constant
+    cc_roi_scaling_costs = dppq*multiplier*cost_scaling_constant
     cc_roi_total_costs = cc_roi_scaling_costs + roi_fixed_costs
-    discretized_returns_df['CC'] = 100*(discretized_returns_df['1y_return_per_sector']*multiplier - cc_roi_total_costs)/(discretized_returns_df['day_pledge_per_QAP']*multiplier)
-    return discretized_returns_df
+    results_dict['CC'] = 100*(rps*multiplier - cc_roi_total_costs)/(dppq*multiplier)
+    return results_dict
 
 def forecast_economy(start_date=None, current_date=None, end_date=None, forecast_length_days=365*6):
     t1 = time.time()
@@ -234,6 +235,7 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
         sector_duration_days,
         offline_data
     )
+    simulation_results = add_costs(simulation_results)
     pib_per_sector = C.PIB / C.SECTOR_SIZE
     simulation_results['day_rewards_per_PIB'] = simulation_results['day_rewards_per_sector'] * pib_per_sector
     baseline = minting.compute_baseline_power_array(
@@ -262,22 +264,6 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
             float(rpp[days_1y*4]), 
             float(rpp[days_1y*5]), 
         ],
-        '1y_return_per_sector': [
-            float(rps[0]), 
-            float(rps[days_1y]), 
-            float(rps[days_1y*2]),  
-            float(rps[days_1y*3]), 
-            float(rps[days_1y*4]), 
-            float(rps[days_1y*5]), 
-        ],
-        'day_pledge_per_QAP': [
-            float(pledge[0]), 
-            float(pledge[days_1y]), 
-            float(pledge[days_1y*2]),  
-            float(pledge[days_1y*3]), 
-            float(pledge[days_1y*4]), 
-            float(pledge[days_1y*5]), 
-        ]
     })
 
     # plot
