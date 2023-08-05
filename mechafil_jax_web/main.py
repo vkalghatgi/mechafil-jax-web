@@ -179,7 +179,7 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
             alt.Chart(minting_df)
             .mark_line()
             .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y=alt.Y("FIL", title='FIL/day'), color=alt.Color('na', legend=alt.Legend(orient="top", title=None)))
+                    y=alt.Y("FILRate", title='FIL/day'), color=alt.Color('na', legend=alt.Legend(orient="top", title=None)))
             .properties(title="Minting Rate")
             .configure_title(fontSize=14, anchor='middle')
         )
