@@ -142,7 +142,7 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
             alt.Chart(roi_df)
             .mark_line()
             .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y=alt.Y("%"), color=alt.Color('Scenario'))
+                    y=alt.Y("%"), color=alt.Color('Scenario', legend=None))
             .properties(title="1Y Sector FoFR")
             .configure_title(fontSize=14, anchor='middle')
             # .add_params(hover)
@@ -158,7 +158,7 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
             alt.Chart(pledge_per_qap_df)
             .mark_line()
             .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y=alt.Y("FIL"), color=alt.Color('Scenario'))
+                    y=alt.Y("FIL"), color=alt.Color('Scenario', legend=None))
             .properties(title="Pledge/32GiB QAP")
             .configure_title(fontSize=14, anchor='middle')
         )
@@ -171,7 +171,7 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
             alt.Chart(minting_df)
             .mark_line()
             .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y=alt.Y("FILRate", title='FIL/day'), color=alt.Color('Scenario'))
+                    y=alt.Y("FILRate", title='FIL/day'), color=alt.Color('Scenario', legend=None))
             .properties(title="Minting Rate")
             .configure_title(fontSize=14, anchor='middle')
         )
@@ -185,7 +185,7 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
             alt.Chart(cs_df)
             .mark_line()
             .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y=alt.Y("cs", title='M-FIL'), color=alt.Color('Scenario'))
+                    y=alt.Y("cs", title='M-FIL'), color=alt.Color('Scenario', legend=None))
             .properties(title="Circulating Supply")
             .configure_title(fontSize=14, anchor='middle')
         )
