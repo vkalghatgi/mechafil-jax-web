@@ -40,7 +40,9 @@ st.markdown(
 
     - Engage with us on [X](https://x.com/cryptoeconlab)
 
+    - Read more of our research on [Medium](https://medium.com/cryptoeconlab) and [HackMD](https://hackmd.io/@cryptoecon/almanac/)
+
     ### Disclaimer
-    This web-app was made for informational purposes only. CryptoEconLab does not provide legal, tax, financial or investment advice. No party should act in reliance upon, or with the expectation of, any such advice.
+    CryptoEconLab designed this application for informational purposes only. CryptoEconLab does not provide legal, tax, financial or investment advice. No party should act in reliance upon, or with the expectation of, any such advice.
 """
 )
