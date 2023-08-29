@@ -85,11 +85,11 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
     # locked_dff['Optimistic'] = optimistic_results['day_network_reward']
     locked_dff['date'] = pd.to_datetime(du.get_t(start_date, end_date=end_date))
 
-    returns_per_pib_dff = pd.DataFrame()
-    returns_per_pib_dff['StatusQuo'] = status_quo_results['1y_return_per_pib']
-    # returns_per_pib_dff['Pessimistic'] = pessimistic_results['1y_return_per_pib']
-    # returns_per_pib_dff['Optimistic'] = optimistic_results['1y_return_per_pib']
-    returns_per_pib_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=returns_per_pib_dff.shape[0]))
+    # returns_per_pib_dff = pd.DataFrame()
+    # returns_per_pib_dff['StatusQuo'] = status_quo_results['1y_return_per_pib']
+    # # returns_per_pib_dff['Pessimistic'] = pessimistic_results['1y_return_per_pib']
+    # # returns_per_pib_dff['Optimistic'] = optimistic_results['1y_return_per_pib']
+    # returns_per_pib_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=returns_per_pib_dff.shape[0]))
 
     pledge_dff = pd.DataFrame()
     pledge_dff['StatusQuo'] = status_quo_results['day_pledge_per_QAP']
@@ -103,14 +103,14 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
     # roi_dff['Optimistic'] = optimistic_results['1y_sector_roi'] * 100
     roi_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=roi_dff.shape[0]))
 
-    roi_with_costs_dff = pd.DataFrame()
-    roi_with_costs_dff['FIL+-sq'] = status_quo_results['FIL+']
-    roi_with_costs_dff['CC-sq'] = status_quo_results['CC']
-    # roi_with_costs_dff['FIL+-o'] = optimistic_results['FIL+']
-    # roi_with_costs_dff['CC-o'] = optimistic_results['CC']
-    # roi_with_costs_dff['FIL+-p'] = pessimistic_results['FIL+']
-    # roi_with_costs_dff['CC-p'] = pessimistic_results['CC']
-    roi_with_costs_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=roi_with_costs_dff.shape[0]))
+    # roi_with_costs_dff = pd.DataFrame()
+    # roi_with_costs_dff['FIL+-sq'] = status_quo_results['FIL+']
+    # roi_with_costs_dff['CC-sq'] = status_quo_results['CC']
+    # # roi_with_costs_dff['FIL+-o'] = optimistic_results['FIL+']
+    # # roi_with_costs_dff['CC-o'] = optimistic_results['CC']
+    # # roi_with_costs_dff['FIL+-p'] = pessimistic_results['FIL+']
+    # # roi_with_costs_dff['CC-p'] = pessimistic_results['CC']
+    # roi_with_costs_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=roi_with_costs_dff.shape[0]))
     
     with col1:
         power_df = pd.melt(power_dff, id_vars=["date"], 
