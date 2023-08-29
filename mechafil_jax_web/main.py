@@ -47,7 +47,7 @@ def get_offline_data(start_date, current_date, end_date):
 
 def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
     # convert results dictionary into a dataframe so that we can use altair to make nice plots
-    status_quo_results = scenario_results['status-quo'][0]
+    status_quo_results = scenario_results['status-quo']
     # status_quo_yearly_returns = scenario_results['status-quo'][1]
     # pessimistic_results = scenario_results['pessimistic'][0]
     # pessimistic_yearly_returns = scenario_results['pessimistic'][1]
@@ -242,34 +242,34 @@ def run_sim(rbp, rr, fpr, lock_target, start_date, current_date, forecast_length
         sector_duration_days,
         offline_data
     )
-    simulation_results = add_costs(simulation_results, cost_scaling_constant, filp_scaling_cost_pct)
-    pib_per_sector = C.PIB / C.SECTOR_SIZE
-    simulation_results['day_rewards_per_PIB'] = simulation_results['day_rewards_per_sector'] * pib_per_sector
-    # compute yearly cumulative returns
-    pledge = simulation_results['day_pledge_per_QAP']
-    rps = simulation_results['1y_return_per_sector']
-    rpp = rps * pib_per_sector
-    simulation_results['1y_return_per_pib'] = rpp
-    days_1y = 365
-    yearly_returns_df = pd.DataFrame({
-        'date': [
-            str(current_date), 
-            str(current_date+timedelta(days=365*1)), 
-            str(current_date+timedelta(days=365*2)), 
-            str(current_date+timedelta(days=365*3)),
-            str(current_date+timedelta(days=365*4)),
-            str(current_date+timedelta(days=365*5)),
-        ],
-        '1y_return_per_pib': [
-            float(rpp[0]), 
-            float(rpp[days_1y]), 
-            float(rpp[days_1y*2]),  
-            float(rpp[days_1y*3]), 
-            float(rpp[days_1y*4]), 
-            float(rpp[days_1y*5]), 
-        ],
-    })
-    return simulation_results, yearly_returns_df
+    # simulation_results = add_costs(simulation_results, cost_scaling_constant, filp_scaling_cost_pct)
+    # pib_per_sector = C.PIB / C.SECTOR_SIZE
+    # simulation_results['day_rewards_per_PIB'] = simulation_results['day_rewards_per_sector'] * pib_per_sector
+    # # compute yearly cumulative returns
+    # pledge = simulation_results['day_pledge_per_QAP']
+    # rps = simulation_results['1y_return_per_sector']
+    # rpp = rps * pib_per_sector
+    # simulation_results['1y_return_per_pib'] = rpp
+    # days_1y = 365
+    # yearly_returns_df = pd.DataFrame({
+    #     'date': [
+    #         str(current_date), 
+    #         str(current_date+timedelta(days=365*1)), 
+    #         str(current_date+timedelta(days=365*2)), 
+    #         str(current_date+timedelta(days=365*3)),
+    #         str(current_date+timedelta(days=365*4)),
+    #         str(current_date+timedelta(days=365*5)),
+    #     ],
+    #     '1y_return_per_pib': [
+    #         float(rpp[0]), 
+    #         float(rpp[days_1y]), 
+    #         float(rpp[days_1y*2]),  
+    #         float(rpp[days_1y*3]), 
+    #         float(rpp[days_1y*4]), 
+    #         float(rpp[days_1y*5]), 
+    #     ],
+    # })
+    return simulation_results #, yearly_returns_df
 
 def forecast_economy(start_date=None, current_date=None, end_date=None, forecast_length_days=365*6):
     t1 = time.time()
@@ -304,9 +304,9 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
         rr = jnp.ones(forecast_length_days) * rr_val
         fpr = jnp.ones(forecast_length_days) * fpr_val
         
-        simulation_results, yearly_returns_df = run_sim(rbp, rr, fpr, lock_target, start_date, current_date, forecast_length_days, sector_duration_days, offline_data, 
+        simulation_results = run_sim(rbp, rr, fpr, lock_target, start_date, current_date, forecast_length_days, sector_duration_days, offline_data, 
                 cost_scaling_constant=cost_scaling_constant, filp_scaling_cost_pct=filp_scaling_cost_pct)
-        scenario_results[scenario_strings[ii]] = (simulation_results, yearly_returns_df)
+        scenario_results[scenario_strings[ii]] = simulation_results
 
     baseline = minting.compute_baseline_power_array(
         np.datetime64(start_date), np.datetime64(end_date), offline_data['init_baseline_eib'],
@@ -354,10 +354,10 @@ def main():
         st.slider("FIL+ Rate (Percentage)", min_value=10, max_value=99, value=smoothed_last_historical_fil_plus_pct, step=1, format='%d', key="fpr_slider",
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
         
-        st.slider("Cost Factor", min_value=0.0, max_value=0.2, value=0.1, step=0.01, format='%0.02f', key="cost_scaling_constant",
-                on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
-        st.slider("Scaling Cost Fraction", min_value=0.0, max_value=1.0, value=0.5, step=0.01, format='%0.02f', key="filp_scaling_cost_pct",
-                on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
+        # st.slider("Cost Factor", min_value=0.0, max_value=0.2, value=0.1, step=0.01, format='%0.02f', key="cost_scaling_constant",
+        #         on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
+        # st.slider("Scaling Cost Fraction", min_value=0.0, max_value=1.0, value=0.5, step=0.01, format='%0.02f', key="filp_scaling_cost_pct",
+        #         on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
 
         st.button("Forecast", on_click=forecast_economy, kwargs=forecast_kwargs, key="forecast_button")
 
