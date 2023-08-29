@@ -1,13 +1,12 @@
 import streamlit as st
-from PIL import Image
 
 st.set_page_config(
     page_title="Introduction",
     page_icon="👋",
 )
 
-image = Image.open('cover.png')
-st.image(image)
+with st.echo():
+    st.markdown("[![CryptoEcconLab](./app/static/cover.png)](https://cryptoeconlab.io)")
 
 st.write("# Filecoin CryptoEconomics Explorer")
 
