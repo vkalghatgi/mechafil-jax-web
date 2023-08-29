@@ -1,11 +1,15 @@
 import streamlit as st
+from PIL import Image
 
 st.set_page_config(
     page_title="Introduction",
     page_icon="👋",
 )
 
-st.write("# 👋 Welcome to Filecoin's CryptoEconomics Explorer!")
+image = Image.open('cover.png')
+st.image(image)
+
+st.write("# Filecoin CryptoEconomics Explorer")
 
 st.sidebar.success("Select a Page above.")
 
