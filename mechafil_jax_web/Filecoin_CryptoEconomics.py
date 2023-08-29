@@ -7,13 +7,11 @@ st.set_page_config(
 
 st.markdown("[![CryptoEconLab](./app/static/cover.png)](https://cryptoeconlab.io)")
 
-st.write("# Filecoin CryptoEconomics Explorer")
-
 st.sidebar.success("Select a Page above.")
 
 st.markdown(
     """
-    ### Introduction
+    ### Filecoin CryptoEconomics Explorer
     This web-app implements a digital twin of the Filecoin Economy. It can be used to forecast all the components underlying Filecoin's circulating supply (i.e., minting, vesting, locking, and burning), based on a set of parameters that encode storage provider behavior.
     The model is best suited to test a hypothesis about how a change in storage provider behavior will impact the main drivers of circulating supply. It can also be used to test changes in certain economic parameters of Filecoin.
     To learn more about the model assumptions and design, please refer to:
