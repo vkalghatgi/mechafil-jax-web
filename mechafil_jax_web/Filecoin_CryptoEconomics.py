@@ -5,8 +5,7 @@ st.set_page_config(
     page_icon="👋",
 )
 
-with st.echo():
-    st.markdown("[![CryptoEcconLab](./app/static/cover.png)](https://cryptoeconlab.io)")
+st.markdown("[![CryptoEconLab](./app/static/cover.png)](https://cryptoeconlab.io)")
 
 st.write("# Filecoin CryptoEconomics Explorer")
 
