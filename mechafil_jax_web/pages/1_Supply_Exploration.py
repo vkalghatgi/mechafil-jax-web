@@ -198,7 +198,7 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date):
             alt.Chart(locked_df)
             .mark_line()
             .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y=alt.Y("cs", title='M-FIL'), color=alt.Color('Scenario'))
+                    y=alt.Y("cs", title='M-FIL'), color=alt.Color('Scenario', legend=None))
             .properties(title="Network Locked")
             .configure_title(fontSize=14, anchor='middle')
         )
