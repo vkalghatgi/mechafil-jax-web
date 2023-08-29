@@ -277,8 +277,8 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
     rb_onboard_power_pib_day =  st.session_state['rbp_slider']
     renewal_rate_pct = st.session_state['rr_slider']
     fil_plus_rate_pct = st.session_state['fpr_slider']
-    cost_scaling_constant = st.session_state['cost_scaling_constant']
-    filp_scaling_cost_pct = st.session_state['filp_scaling_cost_pct']
+    # cost_scaling_constant = st.session_state['cost_scaling_constant']
+    # filp_scaling_cost_pct = st.session_state['filp_scaling_cost_pct']
 
     lock_target = 0.3
     sector_duration_days = 360
@@ -304,8 +304,8 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
         rr = jnp.ones(forecast_length_days) * rr_val
         fpr = jnp.ones(forecast_length_days) * fpr_val
         
-        simulation_results = run_sim(rbp, rr, fpr, lock_target, start_date, current_date, forecast_length_days, sector_duration_days, offline_data, 
-                cost_scaling_constant=cost_scaling_constant, filp_scaling_cost_pct=filp_scaling_cost_pct)
+        simulation_results = run_sim(rbp, rr, fpr, lock_target, start_date, current_date, forecast_length_days, sector_duration_days, offline_data) 
+                #cost_scaling_constant=cost_scaling_constant, filp_scaling_cost_pct=filp_scaling_cost_pct)
         scenario_results[scenario_strings[ii]] = simulation_results
 
     baseline = minting.compute_baseline_power_array(
