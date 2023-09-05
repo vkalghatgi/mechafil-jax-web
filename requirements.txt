@@ -8,6 +8,6 @@ numpy
 scipy
 matplotlib
 #mechafil
-pystarboard @ git+https://github.com/protocol/pystarboard.git
+pystarboard @ git+https://github.com/protocol/pystarboard.git@port_to_pystarboard
 mechafil-jax @ git+https://github.com/protocol/mechafil-jax.git@flex_lock_target
 scenario-generator @ git+https://github.com/protocol/scenario-generator.git
