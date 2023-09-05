@@ -7,6 +7,7 @@ jaxlib
 numpy
 scipy
 matplotlib
-mechafil
-mechafil-jax @ git+https://github.com/kkarrancsu/mechafil-jax.git
+#mechafil
+pystarboard @ git+https://github.com/protocol/pystarboard.git
+mechafil-jax @ git+https://github.com/protocol/mechafil-jax.git@flex_lock_target
 scenario-generator @ git+https://github.com/protocol/scenario-generator.git
