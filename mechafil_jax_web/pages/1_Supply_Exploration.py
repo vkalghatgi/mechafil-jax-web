@@ -367,7 +367,7 @@ def main():
         "Gamma Weighting Mechanism", 
         [0, 1, 2], 
         captions = ['Arithmetic', 'Geometric', 'Harmonic'], 
-        key='gamma_slider', 
+        key='weighting_mechanism_slider', 
         on_change=forecast_economy, 
         kwargs=forecast_kwargs, 
         disabled=False, 
