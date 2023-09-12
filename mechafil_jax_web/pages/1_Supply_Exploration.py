@@ -268,6 +268,12 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
     fil_plus_rate_pct = st.session_state['fpr_slider']
     gamma = st.session_state['gamma_slider']
     gamma_weight_type = st.session_state['weighting_mechanism_slider']
+    if gamma_weight_type == 'Arithmetic':
+        gamma_weight_type = 0
+    elif gamma_weight_type == 'Geometric': 
+        gamma_weight_type = 1
+    elif gamma_weight_type == 'Harmonic':
+        gamma_weight_type = 2
     # cost_scaling_constant = st.session_state['cost_scaling_constant']
     # filp_scaling_cost_pct = st.session_state['filp_scaling_cost_pct']
 
@@ -364,15 +370,16 @@ def main():
        # st.slider('Weighting', min_value=0, max_value=2, value=0, step=1, format='%d', key='weighting_mechanism_slider',
         #        on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility='visible')
         st.radio(
-        "Gamma Weighting Mechanism", 
-        [0, 1, 2], 
-        captions = ['Arithmetic', 'Geometric', 'Harmonic'], 
-        key='weighting_mechanism_slider', 
-        on_change=forecast_economy, 
-        kwargs=forecast_kwargs, 
-        disabled=False, 
-        label_visibility='visible',
+            "Gamma Weighting Mechanism", 
+            ['Arithmetic', 'Geometric', 'Harmonic'], 
+           # captions = ['Arithmetic', 'Geometric', 'Harmonic'], 
+            key='weighting_mechanism_slider', 
+            on_change=forecast_economy, 
+            kwargs=forecast_kwargs, 
+            disabled=False, 
+            label_visibility='visible',
         )
+
 
 
 
