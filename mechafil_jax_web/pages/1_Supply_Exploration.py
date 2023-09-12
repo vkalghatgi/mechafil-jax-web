@@ -355,7 +355,7 @@ def main():
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
         st.slider("FIL+ Rate (Percentage)", min_value=10, max_value=99, value=smoothed_last_historical_fil_plus_pct, step=1, format='%d', key="fpr_slider",
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
-        st.slider("Gamma", min_value=0., max_value = 1.0, value=1.0, step=0.1, format='%0.02f', key='gamma_slider', 
+        st.slider("Gamma", min_value=0.0, max_value= 1.0, value=1.0, step=0.1, format='%0.02f', key='gamma_slider', 
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
         st.slider('Weighting', min_value=0, max_value=2, value=0, step=1, format='%d', key='weighting_mechanism_slider',
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility='visible')
