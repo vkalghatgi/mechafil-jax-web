@@ -13,7 +13,7 @@ import jax.numpy as jnp
 
 import streamlit as st
 import streamlit.components.v1 as components
-import st_debug as d
+#import st_debug as d
 import altair as alt
 
 import mechafil_jax.data as data
@@ -391,16 +391,16 @@ def main():
         st.button("Forecast", on_click=forecast_economy, kwargs=forecast_kwargs, key="forecast_button")
 
     
-    if "debug_string" in st.session_state:
-        st.markdown(
-            f'<div class="debug">{ st.session_state["debug_string"]}</div>',
-            unsafe_allow_html=True,
-        )
-    components.html(
-        d.js_code(),
-        height=0,
-        width=0,
-    )
+ #   if "debug_string" in st.session_state:
+  #      st.markdown(
+   #         f'<div class="debug">{ st.session_state["debug_string"]}</div>',
+    #        unsafe_allow_html=True,
+     #   )
+    #components.html(
+    #    d.js_code(),
+     #   height=0,
+      #  width=0,
+    #)
 
 if __name__ == '__main__':
     main()
