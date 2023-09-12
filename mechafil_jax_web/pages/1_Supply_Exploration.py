@@ -228,48 +228,37 @@ def add_costs(results_dict, cost_scaling_constant=0.1, filp_scaling_cost_pct=0.5
     results_dict['CC'] = 100*(rps*multiplier - cc_roi_total_costs)/(dppq*multiplier)
     return results_dict
 
-def run_sim(rbp, rr, fpr, lock_target, start_date, current_date, forecast_length_days, sector_duration_days, offline_data, 
-            cost_scaling_constant=0.1, filp_scaling_cost_pct=0.5):
-    simulation_results = sim.run_sim(
-        rbp,
-        rr,
-        fpr,
-        lock_target,
+# def run_sim(rbp, rr, fpr, lock_target, start_date, current_date, forecast_length_days, sector_duration_days, offline_data, 
+#             cost_scaling_constant=0.1, filp_scaling_cost_pct=0.5):
 
-        start_date,
-        current_date,
-        forecast_length_days,
-        sector_duration_days,
-        offline_data
-    )
-    # simulation_results = add_costs(simulation_results, cost_scaling_constant, filp_scaling_cost_pct)
-    # pib_per_sector = C.PIB / C.SECTOR_SIZE
-    # simulation_results['day_rewards_per_PIB'] = simulation_results['day_rewards_per_sector'] * pib_per_sector
-    # # compute yearly cumulative returns
-    # pledge = simulation_results['day_pledge_per_QAP']
-    # rps = simulation_results['1y_return_per_sector']
-    # rpp = rps * pib_per_sector
-    # simulation_results['1y_return_per_pib'] = rpp
-    # days_1y = 365
-    # yearly_returns_df = pd.DataFrame({
-    #     'date': [
-    #         str(current_date), 
-    #         str(current_date+timedelta(days=365*1)), 
-    #         str(current_date+timedelta(days=365*2)), 
-    #         str(current_date+timedelta(days=365*3)),
-    #         str(current_date+timedelta(days=365*4)),
-    #         str(current_date+timedelta(days=365*5)),
-    #     ],
-    #     '1y_return_per_pib': [
-    #         float(rpp[0]), 
-    #         float(rpp[days_1y]), 
-    #         float(rpp[days_1y*2]),  
-    #         float(rpp[days_1y*3]), 
-    #         float(rpp[days_1y*4]), 
-    #         float(rpp[days_1y*5]), 
-    #     ],
-    # })
-    return simulation_results #, yearly_returns_df
+#     # simulation_results = add_costs(simulation_results, cost_scaling_constant, filp_scaling_cost_pct)
+#     # pib_per_sector = C.PIB / C.SECTOR_SIZE
+#     # simulation_results['day_rewards_per_PIB'] = simulation_results['day_rewards_per_sector'] * pib_per_sector
+#     # # compute yearly cumulative returns
+#     # pledge = simulation_results['day_pledge_per_QAP']
+#     # rps = simulation_results['1y_return_per_sector']
+#     # rpp = rps * pib_per_sector
+#     # simulation_results['1y_return_per_pib'] = rpp
+#     # days_1y = 365
+#     # yearly_returns_df = pd.DataFrame({
+#     #     'date': [
+#     #         str(current_date), 
+#     #         str(current_date+timedelta(days=365*1)), 
+#     #         str(current_date+timedelta(days=365*2)), 
+#     #         str(current_date+timedelta(days=365*3)),
+#     #         str(current_date+timedelta(days=365*4)),
+#     #         str(current_date+timedelta(days=365*5)),
+#     #     ],
+#     #     '1y_return_per_pib': [
+#     #         float(rpp[0]), 
+#     #         float(rpp[days_1y]), 
+#     #         float(rpp[days_1y*2]),  
+#     #         float(rpp[days_1y*3]), 
+#     #         float(rpp[days_1y*4]), 
+#     #         float(rpp[days_1y*5]), 
+#     #     ],
+#     # })
+#     return simulation_results #, yearly_returns_df
 
 def forecast_economy(start_date=None, current_date=None, end_date=None, forecast_length_days=365*6):
     t1 = time.time()
@@ -306,7 +295,22 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
         rr = jnp.ones(forecast_length_days) * rr_val
         fpr = jnp.ones(forecast_length_days) * fpr_val
         
-        simulation_results = run_sim(rbp, rr, fpr, lock_target, start_date, current_date, forecast_length_days, sector_duration_days, offline_data, gamma=gamma, gamma_weight_type=gamma_weight_type) 
+        simulation_results = sim.run_sim(
+            rbp,
+            rr,
+            fpr,
+            lock_target,
+
+            start_date,
+            current_date,
+            forecast_length_days,
+            sector_duration_days,
+            offline_data,
+            gamma=gamma, 
+            gamma_weight_type=gamma_weight_type
+        )
+        
+        # simulation_results = run_sim(rbp, r÷r, fpr, lock_target, start_date, current_date, forecast_length_days, sector_duration_days, offline_data, 
                 #cost_scaling_constant=cost_scaling_constant, filp_scaling_cost_pct=filp_scaling_cost_pct)
         scenario_results[scenario_strings[ii]] = simulation_results
 
