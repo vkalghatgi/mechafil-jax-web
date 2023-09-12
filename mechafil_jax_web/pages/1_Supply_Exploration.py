@@ -361,9 +361,21 @@ def main():
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
         st.slider("Gamma", min_value=0.0, max_value= 1.0, value=1.0, step=0.1, format='%0.02f', key='gamma_slider', 
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
-        st.slider('Weighting', min_value=0, max_value=2, value=0, step=1, format='%d', key='weighting_mechanism_slider',
-                on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility='visible')
-        
+       # st.slider('Weighting', min_value=0, max_value=2, value=0, step=1, format='%d', key='weighting_mechanism_slider',
+        #        on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility='visible')
+        st.radio(
+        "Gamma Weighting Mechanism", 
+        [0, 1, 2], 
+        captions = ['Arithmetic', 'Geometric', 'Harmonic'], 
+        key='gamma_slider', 
+        on_change=forecast_economy, 
+        kwargs=forecast_kwargs, 
+        disabled=False, 
+        label_visibility='visible',
+        )
+
+
+
         # st.slider("Cost Factor", min_va.,lue=0.0, max_value=0.2, value=0.1, step=0.01, format='%0.02f', key="cost_scaling_constant",
         #         on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
         # st.slider("Scaling Cost Fraction", min_value=0.0, max_value=1.0, value=0.5, step=0.01, format='%0.02f', key="filp_scaling_cost_pct",
