@@ -277,6 +277,8 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
     rb_onboard_power_pib_day =  st.session_state['rbp_slider']
     renewal_rate_pct = st.session_state['rr_slider']
     fil_plus_rate_pct = st.session_state['fpr_slider']
+    gamma = st.session_state['gamma_slider']
+    gamma_weight_type = st.session_state['weighting_mechanism_slider']
     # cost_scaling_constant = st.session_state['cost_scaling_constant']
     # filp_scaling_cost_pct = st.session_state['filp_scaling_cost_pct']
 
@@ -304,7 +306,7 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
         rr = jnp.ones(forecast_length_days) * rr_val
         fpr = jnp.ones(forecast_length_days) * fpr_val
         
-        simulation_results = run_sim(rbp, rr, fpr, lock_target, start_date, current_date, forecast_length_days, sector_duration_days, offline_data) 
+        simulation_results = run_sim(rbp, rr, fpr, lock_target, start_date, current_date, forecast_length_days, sector_duration_days, offline_data, gamma=gamma, gamma_weight_type=gamma_weight_type) 
                 #cost_scaling_constant=cost_scaling_constant, filp_scaling_cost_pct=filp_scaling_cost_pct)
         scenario_results[scenario_strings[ii]] = simulation_results
 
@@ -353,8 +355,12 @@ def main():
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
         st.slider("FIL+ Rate (Percentage)", min_value=10, max_value=99, value=smoothed_last_historical_fil_plus_pct, step=1, format='%d', key="fpr_slider",
                 on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
+        st.slider("Gamma", min_value=0., max_value = 1.0, value=1, step=0.1, format='%0.02f', key='gamma_slider', 
+                on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
+        st.slider('Weighting', min_value=0, max_value=2, value=0, step=1, format='%d', key='weighting_mechanism_slider',
+                on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility='visible')
         
-        # st.slider("Cost Factor", min_value=0.0, max_value=0.2, value=0.1, step=0.01, format='%0.02f', key="cost_scaling_constant",
+        # st.slider("Cost Factor", min_va.,lue=0.0, max_value=0.2, value=0.1, step=0.01, format='%0.02f', key="cost_scaling_constant",
         #         on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
         # st.slider("Scaling Cost Fraction", min_value=0.0, max_value=1.0, value=0.5, step=0.01, format='%0.02f', key="filp_scaling_cost_pct",
         #         on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
