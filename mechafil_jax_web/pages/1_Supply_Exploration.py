@@ -332,7 +332,7 @@ def forecast_economy(start_date=None, current_date=None, end_date=None, forecast
 
 def main():
     st.set_page_config(
-        page_title="Filecoin Economics Explorer",
+        page_title="Hybrid Consensus Pledge Explorer",
         page_icon="🚀",  # TODO: can update this to the FIL logo
         layout="wide",
     )
