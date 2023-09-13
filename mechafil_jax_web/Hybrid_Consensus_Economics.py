@@ -42,7 +42,7 @@ Defining variables:
 - $q$: Sector QAP
 - $b(t)$: Filecoin's exponential baseline function
 - $S$: Filecoin Circulating Supply 
-- $\alpha$: Target lock (currently: $\alpha = 0.3$)
+- \\alpha Target lock (currently: $\\alpha = 0.3$)
 
 Filecoin initial pledge for a sector committed at time $t$ with QAP $q$ is as follows: 
 
@@ -83,7 +83,7 @@ $$ P_{C,B}(t) = \alpha S(t) \cdot \frac{q}{max(Q(t), b(t))} $$
 $P_C(t)$ reduces to: 
 
 $$ P_C(t) = \alpha S(t) \cdot q \left( (1 - \gamma') \frac{1}{Q(t)} + \gamma'
-\frac{1}{max(Q(t), b(t))} \right) $$
+\\frac{1}{max(Q(t), b(t))} \right) $$
 
 $-\frac{0.3 \gamma  q(t) S(t) b'(t)}{b(t)^2}+\frac{0.3 \gamma  S(t) q'(t)}{b(t)}+\frac{0.3 \gamma  q(t) S'(t)}{b(t)}+\frac{0.3 (1-\gamma ) S(t) q'(t)}{Q(t)}-\frac{0.3 (1-\gamma ) q(t) S(t) Q'(t)}{Q(t)^2}+\frac{0.3 (1-\gamma ) q(t) S'(t)}{Q(t)}$
 
