@@ -67,7 +67,33 @@ Minting is broken into relevant components as shown below:
 where $\\gamma = 0.7$ per the current protocol spec
 ## Proposed Hybrid Consensus Pledge Model 
 
-Propose adjusting the initial consensus pledge calculation such that it has a "simple" consensus pledge $P_{C,S}$ and "baseline" consensus pledge component $P_{C,B}$
+Propose adjusting the initial consensus pledge calculation such that it has a "simple" consensus pledge $P_{C,S}$ and "baseline" consensus pledge component $P_{C,B}$, determined by some weighting parameterized by $\\gamma'$, analogous to the minting model. This can be implemented with a number of weighting schemes that interpolate differently between the regions $0 \le \\gamma' \le 1$. Some of these weighting schemas are specified below: 
+
+### Arithmetic Weighting 
+
+This is most analogous to the current minting model and $P_{C}$ is calculated as per below: 
+
+$$P_C(t) = (1-\\gamma')P_{C,S}(t) + \\gamma' P_{C,B}(t) $$
+
+Initially, set $\\gamma' = 0.7$: (Note, $\\gamma$ can take on any value such that $0 \le \\gamma' \le 1$, but start with $\\gamma' = \\gamma$ per the minting model's specification:  
+
+$$ P_{C,S}(t) = \\alpha S(t) \\cdot \\frac{q}{Q(t)} $$
+$$ P_{C,B}(t) = \\alpha S(t) \\cdot \\frac{q}{max(Q(t), b(t))} $$
+
+$P_C(t)$ reduces to: 
+
+$$ P_C(t) = \\alpha S(t) \\cdot q \\left( (1 - \\gamma') \\frac{1}{Q(t)} + \\gamma'
+\\frac{1}{max(Q(t), b(t))} \\right) $$
+
+$-\\frac{0.3 \\gamma  q(t) S(t) b'(t)}{b(t)^2}+\\frac{0.3 \\gamma  S(t) q'(t)}{b(t)}+\\frac{0.3 \\gamma  q(t) S'(t)}{b(t)}+\\frac{0.3 (1-\\gamma ) S(t) q'(t)}{Q(t)}-\\frac{0.3 (1-\\gamma ) q(t) S(t) Q'(t)}{Q(t)^2}+\\frac{0.3 (1-\\gamma ) q(t) S'(t)}{Q(t)}$
+
+### Geometric Weighting 
+
+$$ P_{C}(t) = P_{C,S}(t)^{1 - \\gamma'} \\cdot P_{C,B}(t)^{\\gamma'} $$
+
+### Harmonic Weighting 
+
+$$ P_{C}(t) = \\frac{1}{(1 - \\gamma')\\frac{1}{P_{C,S}(t)} + \\gamma' \\frac{1}{P_{C,B}(t)}} $$
 
 # Want to learn more?
 
